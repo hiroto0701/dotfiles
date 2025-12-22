@@ -8,6 +8,7 @@
 
 - **zinit**: Zsh プラグインマネージャー
 - **Powerlevel10k**: Zsh テーマ
+- **Neovim**: テキストエディタ（Lazy.nvim でプラグイン管理）
 - **ghostty**: ターミナルエミュレーター
 - **fzf**: ファジーファインダー（fd と組み合わせて使用）
 - **bat**: モダンな `cat` コマンドの代替ツール（fzf のプレビューで使用）
@@ -84,6 +85,9 @@ brew install ghq
 
 # lsd（モダンな ls コマンドの代替ツール）
 brew install lsd
+
+# neovim（テキストエディタ）
+brew install neovim
 
 # その他のツール（必要に応じて）
 brew install pyenv
@@ -191,7 +195,17 @@ p10k configure
 - **bat**: モダンな `cat` コマンドの代替ツール（シンタックスハイライト、fzf のプレビューで使用）
 - **ghq**: Git リポジトリ管理ツール（fzf と組み合わせてリポジトリを検索・移動）
 - **lsd**: モダンな `ls` コマンドの代替ツール（アイコン表示、カラー出力など）
+- **neovim**: モダンなテキストエディタ（Lazy.nvim でプラグイン管理）
 - **ghostty**: モダンなターミナルエミュレーター
+
+### Neovim プラグイン（Lazy.nvim 経由）
+
+- **catppuccin**: カラースキーム
+- **alpha-nvim**: スタートアップ画面
+- **neo-tree**: ファイルエクスプローラー
+- **telescope**: ファジーファインダー
+- **nvim-treesitter**: シンタックスハイライト
+- **nvim-lspconfig**: LSP 設定
 
 ## chezmoi チートシート
 
@@ -301,6 +315,41 @@ ghostty の設定ファイルは `~/.config/ghostty/config` として管理さ�
 
 ```bash
 chezmoi edit dot_config/ghostty/config
+```
+
+### Neovim の設定
+
+Neovim の設定は `~/.config/nvim/` として管理されています。設定ファイルの構成：
+
+```text
+dot_config/nvim/
+├── init.lua              # メインの設定ファイル
+├── lazy-lock.json        # Lazy.nvim のロックファイル
+├── lua/
+│   └── plugins/          # プラグイン設定
+│       ├── alpha.lua     # スタートアップ画面
+│       ├── catppuccin.lua # カラースキーム
+│       ├── lsp.lua       # LSP 設定
+│       ├── neo-tree.lua  # ファイルエクスプローラー
+│       ├── telescope.lua # ファジーファインダー
+│       └── treesitter.lua # シンタックスハイライト
+└── after/
+    └── lsp/              # LSP サーバー固有の設定
+        ├── cssls.lua
+        ├── html.lua
+        ├── jsonls.lua
+        ├── lua_ls.lua
+        └── ts_ls.lua
+```
+
+編集する場合は：
+
+```bash
+# メインの設定ファイルを編集
+chezmoi edit dot_config/nvim/init.lua
+
+# プラグイン設定を編集
+chezmoi edit dot_config/nvim/lua/plugins/lsp.lua
 ```
 
 ### ghq のカスタム関数
