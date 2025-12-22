@@ -10,6 +10,7 @@
 - **Powerlevel10k**: Zsh テーマ
 - **ghostty**: ターミナルエミュレーター
 - **fzf**: ファジーファインダー（fd と組み合わせて使用）
+- **ghq**: Git リポジトリ管理ツール
 - **Homebrew**: パッケージマネージャー（前提条件）
 
 ## 前提条件
@@ -73,6 +74,9 @@ brew install fzf
 # fd（fzf と組み合わせて使用する高速な find コマンド）
 brew install fd
 
+# ghq（Git リポジトリ管理ツール）
+brew install ghq
+
 # その他のツール（必要に応じて）
 brew install pyenv
 brew install volta
@@ -87,7 +91,34 @@ fzf のキーバインドと補完機能を有効化します（既に `.zshrc` 
 $(brew --prefix)/opt/fzf/install
 ```
 
-### 6. 新しいシェルセッションの開始
+### 6. ghq の使い方
+
+ghq は Git リポジトリを一元管理するツールです。以下のカスタム関数が `.zshrc` に定義されています：
+
+- **`cdrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリに移動します
+- **`cursorrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを Cursor で開きます
+- **`nvimrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを NeoVim で開きます
+
+使用例：
+
+```bash
+# リポジトリをクローン（ghq が自動的に管理）
+ghq get https://github.com/user/repo.git
+
+# リポジトリ一覧を表示
+ghq list
+
+# fzf でリポジトリを検索して移動
+cdrepo
+
+# fzf でリポジトリを検索して Cursor で開く
+cursorrepo
+
+# fzf でリポジトリを検索して NeoVim で開く
+nvimrepo
+```
+
+### 7. 新しいシェルセッションの開始
 
 新しいターミナルウィンドウを開くか、以下のコマンドで設定を再読み込みします：
 
@@ -95,7 +126,7 @@ $(brew --prefix)/opt/fzf/install
 source ~/.zshrc
 ```
 
-### 7. Powerlevel10k の設定（初回のみ）
+### 8. Powerlevel10k の設定（初回のみ）
 
 初回起動時に Powerlevel10k の設定ウィザードが表示される場合があります。好みに応じて設定してください：
 
@@ -118,6 +149,7 @@ p10k configure
 
 - **fzf**: ファジーファインダー（ファイル検索、履歴検索など）
 - **fd**: 高速なファイル検索ツール（fzf と組み合わせて使用）
+- **ghq**: Git リポジトリ管理ツール（fzf と組み合わせてリポジトリを検索・移動）
 - **ghostty**: モダンなターミナルエミュレーター
 
 ## chezmoi チートシート
@@ -228,6 +260,14 @@ ghostty の設定ファイルは `~/.config/ghostty/config` として管理さ�
 
 ```bash
 chezmoi edit dot_config/ghostty/config
+```
+
+### ghq のカスタム関数
+
+ghq と fzf を組み合わせたカスタム関数は `.zshrc` に定義されています。関数を追加・変更する場合は：
+
+```bash
+chezmoi edit dot_zshrc
 ```
 
 ## よくある問題と解決方法

@@ -57,3 +57,26 @@ export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 
+# ghq
+# 選択したリポジトリに移動
+cdrepo() {
+  local repodir=$(ghq list | fzf -1 +m) && cd $(ghq root)/$repodir
+}
+
+# 選択したリポジトリをcursorで開く
+cursorrepo() {
+  local repodir=$(ghq list | fzf -1 +m) &&
+  echo Open Cursor WorkSpace! : $(ghq root)/$repodir
+  if [ -n "$repodir" ]; then
+    cursor $(ghq root)/$repodir
+  fi
+}
+
+# 選択したリポジトリをneovimで開く
+nvimrepo() {
+  local repodir=$(ghq list | fzf -1 +m) &&
+  echo Open NeoVim WorkSpace! : $(ghq root)/$repodir
+  if [ -n "$repodir" ]; then
+    nvim $(ghq root)/$repodir
+  fi
+}
