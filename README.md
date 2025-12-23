@@ -89,6 +89,10 @@ brew install lsd
 # neovim（テキストエディタ）
 brew install neovim
 
+# im-select（IME制御ツール）
+brew tap daipeihust/tap
+brew install im-select
+
 # その他のツール（必要に応じて）
 brew install pyenv
 brew install volta
