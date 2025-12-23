@@ -1,5 +1,5 @@
+---@class snacks.dashboard.Config
 return {
-  enabled = true,
   width = 60,
   preset = {
     header = [[
@@ -19,48 +19,10 @@ return {
     },
   },
   sections = {
-    -- ヘッダー（ASCIIアート）
     { section = "header" },
-    
-    -- Recent Files セクション
-    {
-      title = "Recent Files",
-      icon = "󰈔 ",
-      padding = 1,
-    },
-    {
-      section = "recent_files",
-      indent = 2,
-      limit = 5,
-      padding = 1,
-    },
-
-    -- Projects セクション (ghq連携)
-    {
-      title = "Projects",
-      icon = "",
-      padding = 1,
-    },
-    {
-      section = "projects",
-      indent = 2,
-      limit = 5,
-      padding = 1,
-    },
-
-    -- Keymaps セクション
-    {
-      title = "Keymaps",
-      icon = "",
-      padding = 1,
-    },
-    {
-      section = "keys",
-      indent = 2,
-      padding = 1,
-    },
-
-    -- フッター (起動時間)
+    { title = "Recent Files", icon = "󰈔 ", section = "recent_files", indent = 2,  padding = 1 },
+    { title = "Projects", icon = "", section = "projects", indent = 2, padding = 1 },
+    { title = "Keymaps", icon = "", section = "keys", indent = 2, padding = 1 },
     { section = "startup" },
   },
 }
