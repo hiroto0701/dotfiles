@@ -210,6 +210,7 @@ p10k configure
 - **telescope**: ファジーファインダー
 - **nvim-treesitter**: シンタックスハイライト
 - **nvim-lspconfig**: LSP 設定
+- **im-select.nvim**: IME 自動切り替え（ノーマルモード時に英語入力へ自動切替）
 
 ## chezmoi チートシート
 
@@ -333,6 +334,7 @@ dot_config/nvim/
 │   └── plugins/          # プラグイン設定
 │       ├── alpha.lua     # スタートアップ画面
 │       ├── catppuccin.lua # カラースキーム
+│       ├── im-select.lua # IME 自動切り替え
 │       ├── lsp.lua       # LSP 設定
 │       ├── neo-tree.lua  # ファイルエクスプローラー
 │       ├── telescope.lua # ファジーファインダー
@@ -355,6 +357,62 @@ chezmoi edit dot_config/nvim/init.lua
 # プラグイン設定を編集
 chezmoi edit dot_config/nvim/lua/plugins/lsp.lua
 ```
+
+#### Neovim プラグインの追加手順
+
+新しいプラグインを追加する際は、以下の手順に従ってください：
+
+1. **プラグイン設定ファイルを作成**
+
+   chezmoi リポジトリ内に新しいプラグイン設定ファイルを作成します：
+
+   ```bash
+   # 例: im-select.nvim を追加する場合
+   vim ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/im-select.lua
+   ```
+
+2. **chezmoi apply で設定を反映**
+
+   ```bash
+   chezmoi apply
+   ```
+
+3. **NeoVim を起動してプラグインをインストール**
+
+   ```bash
+   nvim
+   ```
+
+   NeoVim 内で以下を実行：
+
+   ```vim
+   :Lazy sync
+   ```
+
+   **重要**: インストールが完了するまで待ってから NeoVim を終了してください。
+
+4. **lazy-lock.json を chezmoi に反映**
+
+   ```bash
+   chezmoi re-add ~/.config/nvim/lazy-lock.json
+   ```
+
+5. **変更をコミット**
+
+   ```bash
+   cd ~/.local/share/chezmoi
+   git add .
+   git commit -m "add: 新しいプラグイン名"
+   git push origin main
+   ```
+
+#### 注意事項
+
+- **`lazy-lock.json` の扱い**: このファイルは NeoVim（Lazy.nvim）が自動更新するファイルです。`chezmoi apply` を実行すると、chezmoi リポジトリのバージョンで上書きされるため、NeoVim でプラグインを更新した後は必ず `chezmoi re-add ~/.config/nvim/lazy-lock.json` で同期してください。
+
+- **`chezmoi apply` と `chezmoi re-add` の違い**:
+  - `chezmoi apply`: chezmoi リポジトリ → 実際のファイル（上書き）
+  - `chezmoi re-add <file>`: 実際のファイル → chezmoi リポジトリ（取り込み）
 
 ### ghq のカスタム関数
 
