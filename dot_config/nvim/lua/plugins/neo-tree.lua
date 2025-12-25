@@ -30,5 +30,6 @@ return {
     -- キーマップ
     vim.keymap.set("n", "<leader>e", ":Neotree toggle<CR>", { desc = "Toggle Neo-tree" })
     vim.keymap.set("n", "<leader>o", ":Neotree focus<CR>", { desc = "Focus Neo-tree" })
+    vim.keymap.set("n", "<leader>gs", ":Neotree float git_status<CR>", { desc = "Git Status" })
   end,
 }
