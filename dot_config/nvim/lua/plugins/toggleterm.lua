@@ -6,18 +6,19 @@ return {
       -- ターミナルのサイズ
       size = function(term)
         if term.direction == "horizontal" then
-          return 15
+          return 15 -- 下部ターミナルの高さ
         elseif term.direction == "vertical" then
           return vim.o.columns * 0.4
         end
       end,
       -- ターミナルを開くキーマップ
       open_mapping = [[<C-\>]],
-      -- ターミナルの方向 (horizontal, vertical, float, tab)
-      direction = "float",
-      -- フロートウィンドウの設定
+      direction = "horizontal",
+      shade_terminals = true,
+      shading_factor = 2,
+      -- フロートウィンドウの設定（lazygit用）
       float_opts = {
-        border = "curved", -- single, double, shadow, curved
+        border = "curved",
         width = function()
           return math.floor(vim.o.columns * 0.9)
         end,
@@ -25,9 +26,6 @@ return {
           return math.floor(vim.o.lines * 0.9)
         end,
       },
-      -- ターミナルの背景を暗くする
-      shade_terminals = true,
-      shading_factor = 2,
     })
 
     -- ターミナルモードでのキーマップ
