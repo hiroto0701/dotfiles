@@ -22,6 +22,17 @@ return {
       separator = { left = "│", right = "" },
       modified = { button = "●" },
       pinned = { button = "󰐃", filename = true },
+      diagnostics = {
+        [vim.diagnostic.severity.ERROR] = { enabled = true, icon = "" },
+        [vim.diagnostic.severity.WARN] = { enabled = true, icon = "" },
+        [vim.diagnostic.severity.INFO] = { enabled = true, icon = "󰋽" },
+        [vim.diagnostic.severity.HINT] = { enabled = true, icon = "󰌵" },
+      },
+      gitsigns = {
+        added = { enabled = true, icon = "+" },
+        changed = { enabled = true, icon = "~" },
+        deleted = { enabled = true, icon = "-" },
+      },
     },
     sidebar_filetypes = {
       ["neo-tree"] = { event = "BufWipeout", text = "", align = "center" },
