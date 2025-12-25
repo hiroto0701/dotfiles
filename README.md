@@ -93,6 +93,9 @@ brew install neovim
 brew tap daipeihust/tap
 brew install im-select
 
+# lazy-git（GUIでgit操作できるようにするツール）
+brew install lazygit
+
 # その他のツール（必要に応じて）
 brew install pyenv
 brew install volta
