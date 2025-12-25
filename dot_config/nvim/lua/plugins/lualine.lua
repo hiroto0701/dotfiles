@@ -25,27 +25,6 @@ return {
         lualine_y = {},
         lualine_z = {},
       },
-      tabline = {
-        lualine_a = {
-          {
-            "buffers",
-            show_filename_only = true,
-            hide_filename_extension = false,
-            show_modified_status = true,
-            mode = 2, -- 0: バッファ番号, 1: ファイル名, 2: 両方, 3: 番号+名前, 4: バッファ番号+ファイル名
-            symbols = {
-              modified = " ●",
-              alternate_file = "",
-              directory = "",
-            },
-          },
-        },
-        lualine_b = {},
-        lualine_c = {},
-        lualine_x = {},
-        lualine_y = {},
-        lualine_z = { "tabs" },
-      },
       extensions = { "neo-tree", "lazy" },
     })
   end,
