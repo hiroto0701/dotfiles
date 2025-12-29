@@ -13,6 +13,7 @@ return {
         "css",
         "javascript",
         "typescript",
+        "jsx",
         "tsx",
         "json",
         "markdown",
