@@ -53,7 +53,7 @@ return {
           -- 実装へジャンプ
           vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
           -- 参照一覧
-          vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+          vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
           -- ホバー（ドキュメント表示）
           vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
           -- シグネチャヘルプ
