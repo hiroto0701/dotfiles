@@ -42,30 +42,30 @@ return {
 
     vim.cmd("autocmd! TermOpen term://*toggleterm#* lua set_terminal_keymaps()")
 
-    -- lazygit用のカスタムターミナル
-    local Terminal = require("toggleterm.terminal").Terminal
-    local lazygit = Terminal:new({
-      cmd = "lazygit",
-      dir = "git_dir",
-      direction = "float",
-      float_opts = {
-        border = "curved",
-      },
-      on_open = function(term)
-        vim.cmd("startinsert!")
-      end,
-      on_close = function(term)
-        vim.cmd("startinsert!")
-      end,
-    })
+    -- lazygit用のカスタムターミナル (Snacksを使用するためコメントアウト)
+    -- local Terminal = require("toggleterm.terminal").Terminal
+    -- local lazygit = Terminal:new({
+    --   cmd = "lazygit",
+    --   dir = "git_dir",
+    --   direction = "float",
+    --   float_opts = {
+    --     border = "curved",
+    --   },
+    --   on_open = function(term)
+    --     vim.cmd("startinsert!")
+    --   end,
+    --   on_close = function(term)
+    --     vim.cmd("startinsert!")
+    --   end,
+    -- })
 
     -- lazygitをトグルする関数
-    function _G.lazygit_toggle()
-      lazygit:toggle()
-    end
+    -- function _G.lazygit_toggle()
+    --   lazygit:toggle()
+    -- end
 
-    -- キーマップ: <leader>gg でlazygitを開く
-    vim.keymap.set("n", "<leader>gg", "<cmd>lua lazygit_toggle()<CR>", { desc = "Lazygit" })
+    -- キーマップ: <leader>gg でlazygitを開く (Snacksで定義されているためコメントアウト)
+    -- vim.keymap.set("n", "<leader>gg", "<cmd>lua lazygit_toggle()<CR>", { desc = "Lazygit" })
 
     -- 複数ターミナルのキーマップ
     vim.keymap.set("n", "<leader>t1", "<cmd>1ToggleTerm<CR>", { desc = "Terminal 1" })

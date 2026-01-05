@@ -1,7 +1,7 @@
--- Lua Language Server 設定
 -- 参考: https://zenn.dev/uga_rosa/articles/afe384341fc2e1
 ---@type vim.lsp.Config
 return {
+  capabilities = require("cmp_nvim_lsp").default_capabilities(),
   settings = {
     Lua = {
       runtime = {
@@ -31,4 +31,3 @@ return {
     },
   },
 }
-
