@@ -36,8 +36,11 @@ return {
   -- nvim-lspconfig（after/lsp と連携）
   {
     "neovim/nvim-lspconfig",
-    dependencies = { "williamboman/mason-lspconfig.nvim" },
+    dependencies = { "williamboman/mason-lspconfig.nvim", "hrsh7th/cmp-nvim-lsp" },
     config = function()
+      -- nvim-cmpのLSP capabilities を追加
+      local capabilities = require("cmp_nvim_lsp").default_capabilities()
+
       -- LSPがアタッチされたときのキーマップ設定
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("UserLspConfig", {}),

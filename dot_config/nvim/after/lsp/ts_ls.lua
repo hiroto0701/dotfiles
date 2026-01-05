@@ -1,4 +1,4 @@
--- TypeScript/JavaScript Language Server 設定
 ---@type vim.lsp.Config
-return {}
-
+return {
+  capabilities = require("cmp_nvim_lsp").default_capabilities(),
+}
