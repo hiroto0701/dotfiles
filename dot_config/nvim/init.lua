@@ -4,6 +4,10 @@ vim.cmd("set tabstop=2")
 vim.cmd("set softtabstop=2")
 vim.cmd("set shiftwidth=2")
 
+-- 行番号の表示
+vim.opt.number = true         -- 行番号を表示
+vim.opt.relativenumber = true -- 相対行番号を有効化（現在行は絶対番号で表示）
+
 -- リーダーキーをスペースに設定
 vim.g.mapleader= " "
 
