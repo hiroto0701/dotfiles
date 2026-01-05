@@ -4,12 +4,13 @@
 
 ## 概要
 
-この dotfiles には以下の設定が含まれています：
+この dotfiles には以下の設定が含まれています
 
 - **zinit**: Zsh プラグインマネージャー
 - **Powerlevel10k**: Zsh テーマ
 - **Neovim**: テキストエディタ（Lazy.nvim でプラグイン管理）
 - **ghostty**: ターミナルエミュレーター
+- **wezterm**: ターミナルエミュレーター
 - **fzf**: ファジーファインダー（fd と組み合わせて使用）
 - **bat**: モダンな `cat` コマンドの代替ツール（fzf のプレビューで使用）
 - **ghq**: Git リポジトリ管理ツール
@@ -26,7 +27,7 @@
 
 ### 1. Homebrew のインストール
 
-Homebrew がインストールされていない場合は、以下のコマンドでインストールします：
+Homebrew がインストールされていない場合は、以下のコマンドでインストールします
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -34,7 +35,7 @@ Homebrew がインストールされていない場合は、以下のコマン�
 
 ### 2. chezmoi のインストール
 
-Homebrew を使用して chezmoi をインストールします：
+Homebrew を使用して chezmoi をインストールします
 
 ```bash
 brew install chezmoi
@@ -42,7 +43,7 @@ brew install chezmoi
 
 ### 3. リポジトリのクローンと適用
 
-chezmoi を使用してこのリポジトリをクローンし、設定を適用します（SSH 接続を使用）：
+chezmoi を使用してこのリポジトリをクローンし、設定を適用します（SSH 接続を使用）
 
 ```bash
 chezmoi init --apply git@github.com:hiroto0701/dotfiles.git
@@ -64,11 +65,11 @@ chezmoi init /Users/username/dotfiles
 chezmoi apply
 ```
 
-**注意**: GitHub への接続は SSH で行う前提です。SSH キーが設定されていない場合は、事前に設定してください。
+**注意** GitHub への接続は SSH で行う前提です。SSH キーが設定されていない場合は、事前に設定してください
 
 ### 4. 依存ツールのインストール
 
-以下のツールを Homebrew でインストールします：
+以下のツールを Homebrew でインストールします
 
 ```bash
 # fzf（ファジーファインダー）
@@ -104,23 +105,23 @@ brew install nodebrew
 
 ### 5. fzf のセットアップ
 
-fzf のキーバインドと補完機能を有効化します（既に `.zshrc` に設定済みですが、初回は手動で実行）：
+fzf のキーバインドと補完機能を有効化します（既に `.zshrc` に設定済みですが、初回は手動で実行）
 
 ```bash
 $(brew --prefix)/opt/fzf/install
 ```
 
-**注意**: fzf のプレビューには `bat` が使用されるように設定されています。ファイルを選択すると、bat でシンタックスハイライト付きでプレビューが表示されます。
+**注意** fzf のプレビューには `bat` が使用されるように設定されています。ファイルを選択すると、bat でシンタックスハイライト付きでプレビューが表示されます
 
 ### 6. ghq の使い方
 
-ghq は Git リポジトリを一元管理するツールです。以下のカスタム関数が `.zshrc` に定義されています：
+ghq は Git リポジトリを一元管理するツールです。以下のカスタム関数が `.zshrc` に定義されています
 
 - **`cdrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリに移動します
 - **`cursorrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを Cursor で開きます
 - **`nvimrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを NeoVim で開きます
 
-使用例：
+使用例
 
 ```bash
 # リポジトリをクローン（ghq が自動的に管理）
@@ -141,7 +142,7 @@ nvimrepo
 
 ### 7. lsd のエイリアス
 
-lsd は `ls` コマンドのモダンな代替ツールで、以下のエイリアスが `.zshrc` に設定されています：
+lsd は `ls` コマンドのモダンな代替ツールで、以下のエイリアスが `.zshrc` に設定されています
 
 - **`ls`**: `lsd` にエイリアスされています（デフォルトでカラー表示とアイコン表示）
 - **`l`**: `lsd -l` - 詳細表示
@@ -149,7 +150,7 @@ lsd は `ls` コマンドのモダンな代替ツールで、以下のエイリ�
 - **`lla`**: `lsd -la` - 隠しファイルを含む詳細表示
 - **`lt`**: `lsd --tree` - ツリー形式で表示
 
-使用例：
+使用例
 
 ```bash
 # 通常のリスト表示（カラーとアイコン付き）
@@ -170,7 +171,7 @@ lt
 
 ### 8. 新しいシェルセッションの開始
 
-新しいターミナルウィンドウを開くか、以下のコマンドで設定を再読み込みします：
+新しいターミナルウィンドウを開くか、以下のコマンドで設定を再読み込みします
 
 ```bash
 source ~/.zshrc
@@ -178,7 +179,7 @@ source ~/.zshrc
 
 ### 9. Powerlevel10k の設定（初回のみ）
 
-初回起動時に Powerlevel10k の設定ウィザードが表示される場合があります。好みに応じて設定してください：
+初回起動時に Powerlevel10k の設定ウィザードが表示される場合があります。好みに応じて設定してください
 
 ```bash
 p10k configure
@@ -204,6 +205,7 @@ p10k configure
 - **lsd**: モダンな `ls` コマンドの代替ツール（アイコン表示、カラー出力など）
 - **neovim**: モダンなテキストエディタ（Lazy.nvim でプラグイン管理）
 - **ghostty**: モダンなターミナルエミュレーター
+- **wezterm**: クロスプラットフォームなターミナルエミュレーター
 
 ### Neovim プラグイン（Lazy.nvim 経由）
 
@@ -311,7 +313,7 @@ chezmoi doctor
 
 ### Powerlevel10k の設定
 
-Powerlevel10k の設定は `~/.p10k.zsh` に保存されます。このファイルも chezmoi で管理したい場合は：
+Powerlevel10k の設定は `~/.p10k.zsh` に保存されます。このファイルも chezmoi で管理したい場合
 
 ```bash
 chezmoi add ~/.p10k.zsh
@@ -319,15 +321,37 @@ chezmoi add ~/.p10k.zsh
 
 ### ghostty の設定
 
-ghostty の設定ファイルは `~/.config/ghostty/config` として管理されています。編集する場合は：
+ghostty の設定ファイルは `~/.config/ghostty/config` として管理されています。編集する場合は
 
 ```bash
 chezmoi edit dot_config/ghostty/config
 ```
 
+### wezterm の設定
+
+wezterm の設定は `~/.config/wezterm/` として管理されています。設定ファイルの構成
+
+```text
+dot_config/wezterm/
+├── wezterm.lua    # メインの設定ファイル（UI設定）
+└── keybinds.lua   # キーバインド設定
+```
+
+編集する場合は
+
+```bash
+# UI設定を編集
+chezmoi edit dot_config/wezterm/wezterm.lua
+
+# キーバインド設定を編集
+chezmoi edit dot_config/wezterm/keybinds.lua
+```
+
+**注意** `wezterm.lua` は `keybinds.lua` を自動的に読み込みます。設定を変更した後は、wezterm を再起動するか、`Ctrl+Shift+R` で設定をリロードしてください
+
 ### Neovim の設定
 
-Neovim の設定は `~/.config/nvim/` として管理されています。設定ファイルの構成：
+Neovim の設定は `~/.config/nvim/` として管理されています。設定ファイルの構成
 
 ```text
 dot_config/nvim/
@@ -351,7 +375,7 @@ dot_config/nvim/
         └── ts_ls.lua
 ```
 
-編集する場合は：
+編集する場合は
 
 ```bash
 # メインの設定ファイルを編集
@@ -392,7 +416,7 @@ chezmoi edit dot_config/nvim/lua/plugins/lsp.lua
    :Lazy sync
    ```
 
-   **重要**: インストールが完了するまで待ってから NeoVim を終了してください。
+   **重要** インストールが完了するまで待ってから NeoVim を終了してください
 
 4. **lazy-lock.json を chezmoi に反映**
 
@@ -411,15 +435,15 @@ chezmoi edit dot_config/nvim/lua/plugins/lsp.lua
 
 #### 注意事項
 
-- **`lazy-lock.json` の扱い**: このファイルは NeoVim（Lazy.nvim）が自動更新するファイルです。`chezmoi apply` を実行すると、chezmoi リポジトリのバージョンで上書きされるため、NeoVim でプラグインを更新した後は必ず `chezmoi re-add ~/.config/nvim/lazy-lock.json` で同期してください。
+- **`lazy-lock.json` の扱い** このファイルは NeoVim（Lazy.nvim）が自動更新するファイルです。`chezmoi apply` を実行すると、chezmoi リポジトリのバージョンで上書きされるため、NeoVim でプラグインを更新した後は必ず `chezmoi re-add ~/.config/nvim/lazy-lock.json` で同期してください
 
-- **`chezmoi apply` と `chezmoi re-add` の違い**:
-  - `chezmoi apply`: chezmoi リポジトリ → 実際のファイル（上書き）
-  - `chezmoi re-add <file>`: 実際のファイル → chezmoi リポジトリ（取り込み）
+- **`chezmoi apply` と `chezmoi re-add` の違い**
+  - `chezmoi apply` chezmoi リポジトリ → 実際のファイル（上書き）
+  - `chezmoi re-add <file>` 実際のファイル → chezmoi リポジトリ（取り込み）
 
 ### ghq のカスタム関数
 
-ghq と fzf を組み合わせたカスタム関数は `.zshrc` に定義されています。関数を追加・変更する場合は：
+ghq と fzf を組み合わせたカスタム関数は `.zshrc` に定義されています。関数を追加・変更する場合は
 
 ```bash
 chezmoi edit dot_zshrc
@@ -427,7 +451,7 @@ chezmoi edit dot_zshrc
 
 ### lsd のエイリアス
 
-lsd のエイリアスは `.zshrc` に定義されています。エイリアスを追加・変更する場合は：
+lsd のエイリアスは `.zshrc` に定義されています。エイリアスを追加・変更する場合は
 
 ```bash
 chezmoi edit dot_zshrc
@@ -437,7 +461,7 @@ chezmoi edit dot_zshrc
 
 ### SSH 接続が失敗する
 
-GitHub への SSH 接続が設定されていない場合は、以下の手順で設定してください：
+GitHub への SSH 接続が設定されていない場合は、以下の手順で設定してください
 
 1. SSH キーを生成（まだ持っていない場合）
 
@@ -461,7 +485,7 @@ ssh -T git@github.com
 
 ### zinit がインストールされない
 
-`.zshrc` には zinit の自動インストール機能が含まれていますが、手動でインストールする場合は：
+`.zshrc` には zinit の自動インストール機能が含まれていますが、手動でインストールする場合は
 
 ```bash
 mkdir -p "$HOME/.local/share/zinit"
@@ -470,14 +494,14 @@ git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/z
 
 ### fzf が動作しない
 
-fzf が正しくインストールされているか確認：
+fzf が正しくインストールされているか確認
 
 ```bash
 which fzf
 fzf --version
 ```
 
-fzf のキーバインドが有効になっていない場合は、`.zshrc` を再読み込み：
+fzf のキーバインドが有効になっていない場合は、`.zshrc` を再読み込み
 
 ```bash
 source ~/.zshrc
@@ -485,7 +509,7 @@ source ~/.zshrc
 
 ### ghostty が見つからない
 
-ghostty がインストールされていない場合は、Homebrew でインストール：
+ghostty がインストールされていない場合は、Homebrew でインストール
 
 ```bash
 brew install ghostty
