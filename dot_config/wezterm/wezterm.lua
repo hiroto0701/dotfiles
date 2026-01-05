@@ -69,6 +69,11 @@ wezterm.on("format-tab-title", function(tab, tabs, panes, config, hover, max_wid
   }
 end)
 
+wezterm.on('gui-startup', function()
+  local _, _, window = wezterm.mux.spawn_window({})
+  window:gui_window():maximize()
+end)
+
 ----------------------------------------------------
 -- keybinds
 ----------------------------------------------------
