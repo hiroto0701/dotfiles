@@ -22,13 +22,52 @@ return {
     config = function()
       require("mason-lspconfig").setup({
         ensure_installed = {
-          "lua_ls",        -- Lua
-          "ts_ls",         -- TypeScript/JavaScript
-          "html",          -- HTML
-          "cssls",         -- CSS
-          "jsonls",        -- JSON
+          "lua_ls",
+          "ts_ls",
+          "html",
+          "cssls",
+          "jsonls",
         },
         automatic_installation = true,
+      })
+    end,
+  },
+
+  -- Mason Tool Installer（LSP、フォーマッター、リンターを一括管理）
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    dependencies = { "williamboman/mason.nvim" },
+    config = function()
+      require("mason-tool-installer").setup({
+        ensure_installed = {
+          -- LSP servers
+          "lua_ls",
+          "ts_ls",
+          "html",
+          "cssls",
+          "jsonls",
+          "dockerls",
+          "postgres-language-server",
+          "prismals",
+          "eslint",
+          "docker_compose_language_service",
+          "biome",
+
+          -- Formatters
+          "jq",
+          "prettier",
+          "biome",
+          "doctoc",
+
+          -- Linter
+          "eslint_d",
+          "jsonlint",
+          "htmlhint",
+          "biome",
+        },
+        auto_update = false,
+        run_on_start = true,
+        start_delay = 3000,
       })
     end,
   },
