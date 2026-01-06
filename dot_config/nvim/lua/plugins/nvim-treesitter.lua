@@ -27,5 +27,11 @@ return {
         enable = true,
       },
     })
+
+    -- ts_context_commentstring の設定
+    require("ts_context_commentstring").setup({
+      enable_autocmd = false,
+    })
   end,
 }
+
