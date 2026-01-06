@@ -8,6 +8,9 @@ vim.cmd("set shiftwidth=2")
 vim.opt.number = true         -- 行番号を表示
 vim.opt.relativenumber = true -- 相対行番号を有効化（現在行は絶対番号で表示）
 
+-- ディレクトリ設定
+vim.opt.autochdir = false     -- ファイルを開いても作業ディレクトリを変更しない
+
 -- リーダーキーをスペースに設定
 vim.g.mapleader= " "
 
