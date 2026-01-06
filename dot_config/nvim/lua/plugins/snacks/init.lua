@@ -325,7 +325,7 @@ return {
     input = { enabled = true },
     notifier = { enabled = true },
     statuscolumn = { enabled = true },
-    indent = { enabled = true },
+    indent = { enabled = false },
     scroll = { enabled = true },
     -- Picker
     picker = {
