@@ -97,6 +97,16 @@ brew install im-select
 # lazy-git（GUIでgit操作できるようにするツール）
 brew install lazygit
 
+# aerospace(window manager)
+brew install --cask nikitabobko/tap/aerospace
+
+# jankyborders(アクティブウィンドウを目立たせる)
+brew tap FelixKratz/formulae
+brew install borders
+
+# alt-tab
+brew install --cask alt-tab
+
 # その他のツール（必要に応じて）
 brew install pyenv
 brew install volta
