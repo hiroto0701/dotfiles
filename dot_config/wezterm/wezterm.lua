@@ -6,6 +6,7 @@ config.font_size = 12.0
 config.use_ime = true
 config.window_background_opacity = 0.6
 config.macos_window_background_blur = 15
+config.color_scheme = 'Tokyo Night Storm'
 
 ----------------------------------------------------
 -- Tab
@@ -27,7 +28,7 @@ config.window_frame = {
 
 -- タブバーを背景色に合わせる
 config.window_background_gradient = {
-  colors = { "#000000" },
+  colors = { "#1a1a2e" },
 }
 
 -- タブの追加ボタンを非表示
@@ -35,6 +36,7 @@ config.show_new_tab_button_in_tab_bar = false
 
 -- タブ同士の境界線を非表示
 config.colors = {
+  background = "#1a1a2e",
   tab_bar = {
     inactive_tab_edge = "none",
   },
