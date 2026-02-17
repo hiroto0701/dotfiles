@@ -14,6 +14,7 @@
 - **fzf**: ファジーファインダー（fd と組み合わせて使用）
 - **bat**: モダンな `cat` コマンドの代替ツール（fzf のプレビューで使用）
 - **ghq**: Git リポジトリ管理ツール
+- **gh**: GitHub CLI（GitHub の操作をコマンドラインから実行）
 - **lsd**: モダンな `ls` コマンドの代替ツール
 - **Homebrew**: パッケージマネージャー（前提条件）
 
@@ -83,6 +84,9 @@ brew install bat
 
 # ghq（Git リポジトリ管理ツール）
 brew install ghq
+
+# gh（GitHub CLI）
+brew install gh
 
 # lsd（モダンな ls コマンドの代替ツール）
 brew install lsd
@@ -212,6 +216,7 @@ p10k configure
 - **fd**: 高速なファイル検索ツール（fzf と組み合わせて使用）
 - **bat**: モダンな `cat` コマンドの代替ツール（シンタックスハイライト、fzf のプレビューで使用）
 - **ghq**: Git リポジトリ管理ツール（fzf と組み合わせてリポジトリを検索・移動）
+- **gh**: GitHub CLI（Issue、PR の作成・管理、リポジトリ操作などを CLI から実行）
 - **lsd**: モダンな `ls` コマンドの代替ツール（アイコン表示、カラー出力など）
 - **neovim**: モダンなテキストエディタ（Lazy.nvim でプラグイン管理）
 - **ghostty**: モダンなターミナルエミュレーター
