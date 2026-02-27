@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "backlog": {
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "--pull",
+        "always",
+        "-e",
+        "BACKLOG_DOMAIN",
+        "-e",
+        "BACKLOG_API_KEY",
+        "ghcr.io/nulab/backlog-mcp-server"
+      ],
+      "env": {
+        "BACKLOG_DOMAIN": "bnx.backlog.com",
+        "BACKLOG_API_KEY": "{{ .backlogApiKey }}"
+      }
+    }
+  }
+}
