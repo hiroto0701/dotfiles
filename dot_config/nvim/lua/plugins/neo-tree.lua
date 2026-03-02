@@ -21,8 +21,11 @@ return {
       },
       window = {
         width = 30,
+        auto_expand_width = true, -- コンテンツに応じて自動的に幅を広げる
         mappings = {
           ["<space>"] = "none", -- リーダーキーとの競合を防ぐ
+          ["<C-h>"] = function() vim.cmd("vertical resize -5") end,
+          ["<C-l>"] = function() vim.cmd("vertical resize +5") end,
         },
       },
     })
