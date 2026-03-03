@@ -113,3 +113,6 @@ alias l='lsd -l'
 alias la='lsd -a'
 alias lla='lsd -la'
 alias lt='lsd --tree'
+
+# direnv - auto-load .envrc per directory
+eval "$(direnv hook zsh)"
