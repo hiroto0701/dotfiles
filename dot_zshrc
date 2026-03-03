@@ -5,6 +5,9 @@ autoload -Uz compinit
 compinit
 # OPENSPEC:END
 
+# direnv - auto-load .envrc per directory (must be before p10k instant prompt)
+eval "$(direnv hook zsh)"
+
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -113,6 +116,3 @@ alias l='lsd -l'
 alias la='lsd -a'
 alias lla='lsd -la'
 alias lt='lsd --tree'
-
-# direnv - auto-load .envrc per directory
-eval "$(direnv hook zsh)"
