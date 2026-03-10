@@ -16,7 +16,7 @@
       ],
       "env": {
         "BACKLOG_DOMAIN": "bnx.backlog.com",
-        "BACKLOG_API_KEY": "{{ .backlogApiKey }}"
+        "BACKLOG_API_KEY": {{ if hasKey . "backlogApiKey" }}"{{ index . "backlogApiKey" }}"{{ else }}""{{ end }}
       }
     },
     "context7": {
@@ -24,7 +24,7 @@
       "args": ["-y", "@upstash/context7-mcp"]
     },
     "tavily": {
-      "url": "https://mcp.tavily.com/mcp/?tavilyApiKey={{ .tavilyApiKey }}"
+      "url": {{ if hasKey . "tavilyApiKey" }}"https://mcp.tavily.com/mcp/?tavilyApiKey={{ .tavilyApiKey }}"{{ else }}""{{ end }}
     }
   }
 }
