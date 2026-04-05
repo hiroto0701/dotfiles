@@ -17,6 +17,7 @@
 - **ghq**: Git リポジトリ管理ツール
 - **gh**: GitHub CLI（GitHub の操作をコマンドラインから実行）
 - **lsd**: モダンな `ls` コマンドの代替ツール
+- **yazi**: ターミナルファイルマネージャー（[キーバインド一覧](docs/yazi-keybindings.md)）
 - **Homebrew**: パッケージマネージャー（前提条件）
 
 ## 前提条件
@@ -69,7 +70,18 @@ chezmoi apply
 
 **注意** GitHub への接続は SSH で行う前提です。SSH キーが設定されていない場合は、事前に設定してください
 
-### 4. 依存ツールのインストール
+### 4. yazi のインストール
+
+yazi とその依存ツールをインストールします
+
+```bash
+brew install yazi ffmpeg-full sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick-full font-symbols-only-nerd-font
+brew link ffmpeg-full imagemagick-full -f --overwrite
+```
+
+キーバインドの詳細は [docs/yazi-keybindings.md](docs/yazi-keybindings.md) を参照してください。
+
+### 5. その他の依存ツールのインストール
 
 以下のツールを Homebrew でインストールします
 
@@ -121,7 +133,7 @@ brew install volta
 brew install nodebrew
 ```
 
-### 5. fzf のセットアップ
+### 6. fzf のセットアップ
 
 fzf のキーバインドと補完機能を有効化します（既に `.zshrc` に設定済みですが、初回は手動で実行）
 
@@ -131,7 +143,7 @@ $(brew --prefix)/opt/fzf/install
 
 **注意** fzf のプレビューには `bat` が使用されるように設定されています。ファイルを選択すると、bat でシンタックスハイライト付きでプレビューが表示されます
 
-### 6. ghq の使い方
+### 7. ghq の使い方
 
 ghq は Git リポジトリを一元管理するツールです。以下のカスタム関数が `.zshrc` に定義されています
 
@@ -158,7 +170,7 @@ cursorrepo
 nvimrepo
 ```
 
-### 7. lsd のエイリアス
+### 8. lsd のエイリアス
 
 lsd は `ls` コマンドのモダンな代替ツールで、以下のエイリアスが `.zshrc` に設定されています
 
@@ -187,7 +199,7 @@ lla
 lt
 ```
 
-### 8. 新しいシェルセッションの開始
+### 9. 新しいシェルセッションの開始
 
 新しいターミナルウィンドウを開くか、以下のコマンドで設定を再読み込みします
 
@@ -195,7 +207,7 @@ lt
 source ~/.zshrc
 ```
 
-### 9. Powerlevel10k の設定（初回のみ）
+### 10. Powerlevel10k の設定（初回のみ）
 
 初回起動時に Powerlevel10k の設定ウィザードが表示される場合があります。好みに応じて設定してください
 
