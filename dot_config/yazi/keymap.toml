@@ -1,8 +1,9 @@
-[manager]
-prepend_keymap = [
-  { on = ["<C-q>", "g"], run = "shell --block -- lazygit" },
-]
+[[mgr.prepend_keymap]]
+on   = [ "g", "i" ]
+run  = "plugin lazygit"
+desc = "run lazygit"
 
+[manager]
 keymap = [
   { on = "<Esc>", run = "escape",             desc = "Exit visual mode, clear selected, or cancel search" },
   { on = "q",     run = "quit",               desc = "Exit the process" },
