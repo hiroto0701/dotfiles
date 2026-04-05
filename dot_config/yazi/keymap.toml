@@ -1,6 +1,6 @@
 [manager]
 prepend_keymap = [
-  { on = ["<Space>", "g"], run = "shell --block -- lazygit" },
+  { on = ["<C-q>", "g"], run = "shell --block -- lazygit" },
 ]
 
 keymap = [
@@ -30,6 +30,7 @@ keymap = [
   { on = "G", run = "arrow 99999999",  desc = "Move cursor to the bottom" },
 
   # Selection
+  { on = "<Space>", run = ["select --state=none", "arrow 1"], desc = "Toggle the current selection state" },
   { on = "v",       run = "visual_mode",                      desc = "Enter visual mode (selection mode)" },
   { on = "V",       run = "visual_mode --unset",              desc = "Enter visual mode (unset mode)" },
   { on = "<C-a>",   run = "select_all --state=true",          desc = "Select all files" },
