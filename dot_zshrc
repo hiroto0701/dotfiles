@@ -107,6 +107,51 @@ nvimrepo() {
   fi
 }
 
+# cdev: 開発レイアウトで起動
+# Usage: cdev [directory]  e.g. cdev ~/project/myapp
+cdev() {
+  local dir="${1:-$(pwd)}"
+  local ws="$CMUX_WORKSPACE_ID"
+  local yazi_surface="$CMUX_SURFACE_ID"
+
+  # 右にClaude用surfaceを作成
+  local claude_out=$(cmux new-split right --workspace "$ws" --surface "$yazi_surface" 2>/dev/null)
+  local claude_surface=$(echo "$claude_out" | grep -oE 'surface:[0-9]+' | head -1)
+
+  # Yaziの下にTerminal用surfaceを作成（左側を上下分割）
+  local term_out=$(cmux new-split down --workspace "$ws" --surface "$yazi_surface" 2>/dev/null)
+  local term_surface=$(echo "$term_out" | grep -oE 'surface:[0-9]+' | head -1)
+
+  # プロンプトが出るまで待ってからコマンドを送るヘルパー
+  _cdev_send() {
+    local surface="$1" cmd="$2"
+    local i=0
+    while [[ $i -lt 30 ]]; do
+      local screen=$(cmux read-screen --workspace "$ws" --surface "$surface" --lines 5 2>/dev/null)
+      if echo "$screen" | grep -qE '╰─|❯|>>>|\$ |% '; then
+        cmux send --workspace "$ws" --surface "$surface" "$cmd" > /dev/null 2>&1
+        cmux send-key --workspace "$ws" --surface "$surface" enter > /dev/null 2>&1
+        return
+      fi
+      sleep 0.3
+      ((i++))
+    done
+  }
+
+  # ┌─────────────────┬──────────────────────┐
+  # │                 │                      │
+  # │   Yazi（上）    │   Claude Code        │
+  # │                 │                      │
+  # ├─────────────────│                      │
+  # │                 │                      │
+  # │  Terminal（下）  │                      │
+  # │                 │                      │
+  # └─────────────────┴──────────────────────┘
+  _cdev_send "$yazi_surface"   "cd $dir && yazi ."
+  _cdev_send "$claude_surface" "cd $dir && claude"
+  _cdev_send "$term_surface"   "cd $dir"
+}
+
 # alias
 alias ls='lsd'
 alias l='lsd -l'
