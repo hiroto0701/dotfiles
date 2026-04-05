@@ -53,7 +53,7 @@ theme = TokyoNight Storm
 
 # font-settings
 font-family = "MesloLGS NF"
-font-size = 13
+font-size = 12
 font-thicken = true
 
 # background
