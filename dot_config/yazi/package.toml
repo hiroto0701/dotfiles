@@ -3,5 +3,15 @@ use = "yazi-rs/plugins:full-border"
 rev = "e84f4fe"
 hash = "6fa6a05a81c98dd000fbca3cca6e9682"
 
+[[plugin.deps]]
+use = "Lil-Dank/lazygit"
+rev = "8c4086c"
+hash = "85316b5e9abeae2531d3e5d02a094381"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:git"
+rev = "e84f4fe"
+hash = "26db011a778f261d730d4f5f8bf24b3f"
+
 [flavor]
 deps = []
