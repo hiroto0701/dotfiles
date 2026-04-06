@@ -148,7 +148,7 @@ cdev() {
   # │                 │                      │
   # └─────────────────┴──────────────────────┘
   _cdev_send "$yazi_surface"   "cd $dir && yazi ."
-  _cdev_send "$claude_surface" "cd $dir && claude"
+  _cdev_send "$claude_surface" "cd $dir && cmux claude-teams"
   _cdev_send "$term_surface"   "cd $dir"
 }
 
