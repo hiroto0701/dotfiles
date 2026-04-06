@@ -1,0 +1,16 @@
+{
+  "shortcuts": {
+    "bindings": {
+      "closeWorkspace": "cmd+w",
+      "closeTab": "cmd+x",
+      "focusPaneLeft": "ctrl+h",
+      "focusPaneDown": "ctrl+j",
+      "focusPaneUp": "ctrl+k",
+      "focusPaneRight": "ctrl+l",
+      "splitRight": "cmd+\\",
+      "splitDown": "cmd+-",
+      "splitBrowserRight": "cmd+shift+\\",
+      "splitBrowserDown": "cmd+shift+-"
+    }
+  }
+}
