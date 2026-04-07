@@ -118,10 +118,6 @@ cdev() {
   local claude_out=$(cmux new-split right --workspace "$ws" --surface "$yazi_surface" 2>/dev/null)
   local claude_surface=$(echo "$claude_out" | grep -oE 'surface:[0-9]+' | head -1)
 
-  # Yaziの下にTerminal用surfaceを作成（左側を上下分割）
-  local term_out=$(cmux new-split down --workspace "$ws" --surface "$yazi_surface" 2>/dev/null)
-  local term_surface=$(echo "$term_out" | grep -oE 'surface:[0-9]+' | head -1)
-
   # プロンプトが出るまで待ってからコマンドを送るヘルパー
   _cdev_send() {
     local surface="$1" cmd="$2"
@@ -140,16 +136,11 @@ cdev() {
 
   # ┌─────────────────┬──────────────────────┐
   # │                 │                      │
-  # │   Yazi（上）    │   Claude Code        │
-  # │                 │                      │
-  # ├─────────────────│                      │
-  # │                 │                      │
-  # │  Terminal（下） │                      │
+  # │      Yazi       │   Claude Code        │
   # │                 │                      │
   # └─────────────────┴──────────────────────┘
   _cdev_send "$yazi_surface"   "cd $dir && yazi ."
   _cdev_send "$claude_surface" "cd $dir && cmux claude-teams"
-  _cdev_send "$term_surface"   "cd $dir"
 }
 
 # alias
