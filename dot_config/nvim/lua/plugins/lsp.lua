@@ -15,28 +15,19 @@ return {
     end,
   },
 
-  -- Mason と lspconfig の連携
+  -- mason-lspconfig（lspconfig名→masonパッケージ名の変換のために必要）
   {
     "williamboman/mason-lspconfig.nvim",
     dependencies = { "williamboman/mason.nvim" },
     config = function()
-      require("mason-lspconfig").setup({
-        ensure_installed = {
-          "lua_ls",
-          "ts_ls",
-          "html",
-          "cssls",
-          "jsonls",
-        },
-        automatic_installation = true,
-      })
+      require("mason-lspconfig").setup()
     end,
   },
 
   -- Mason Tool Installer（LSP、フォーマッター、リンターを一括管理）
   {
     "WhoIsSethDaniel/mason-tool-installer.nvim",
-    dependencies = { "williamboman/mason.nvim" },
+    dependencies = { "williamboman/mason.nvim", "williamboman/mason-lspconfig.nvim" },
     config = function()
       require("mason-tool-installer").setup({
         ensure_installed = {
@@ -72,13 +63,13 @@ return {
     end,
   },
 
-  -- nvim-lspconfig（after/lsp と連携）
+  -- LSP設定（ビルトインLSP + cmp capabilities）
   {
-    "neovim/nvim-lspconfig",
-    dependencies = { "williamboman/mason-lspconfig.nvim", "hrsh7th/cmp-nvim-lsp" },
+    "hrsh7th/cmp-nvim-lsp",
     config = function()
-      -- nvim-cmpのLSP capabilities を追加
+      -- nvim-cmpのLSP capabilities を全サーバーにグローバル設定
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
+      vim.lsp.config("*", { capabilities = capabilities })
 
       -- LSPがアタッチされたときのキーマップ設定
       vim.api.nvim_create_autocmd("LspAttach", {
@@ -111,9 +102,9 @@ return {
           -- 診断（エラー）表示
           vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, opts)
           -- 前のエラーへ
-          vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+          vim.keymap.set("n", "[d", function() vim.diagnostic.jump({ count = -1 }) end, opts)
           -- 次のエラーへ
-          vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+          vim.keymap.set("n", "]d", function() vim.diagnostic.jump({ count = 1 }) end, opts)
         end,
       })
 

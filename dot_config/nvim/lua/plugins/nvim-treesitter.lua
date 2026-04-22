@@ -1,31 +1,26 @@
 return {
   "nvim-treesitter/nvim-treesitter",
-  branch = "master",
+  branch = "main",
   build = ":TSUpdate",
-  event = { "BufReadPre", "BufNewFile" },
+  lazy = false,
   config = function()
-    require("nvim-treesitter.configs").setup({
-      ensure_installed = {
-        "lua",
-        "vim",
-        "vimdoc",
-        "html",
-        "css",
-        "javascript",
-        "typescript",
-        "tsx",
-        "json",
-        "markdown",
-        "markdown_inline",
-      },
-      sync_install = false,
-      auto_install = true,
-      highlight = {
-        enable = true,
-      },
-      indent = {
-        enable = true,
-      },
+    -- mainブランチではsetup()はinstall_dirのみ受け付ける
+    -- ハイライト・インデントはNeovimビルトインのvim.treesitterが処理
+    require("nvim-treesitter").setup()
+
+    -- 使用するパーサーをインストール（非同期）
+    require("nvim-treesitter.install").install({
+      "lua",
+      "vim",
+      "vimdoc",
+      "html",
+      "css",
+      "javascript",
+      "typescript",
+      "tsx",
+      "json",
+      "markdown",
+      "markdown_inline",
     })
 
     -- ts_context_commentstring の設定
@@ -34,4 +29,3 @@ return {
     })
   end,
 }
-
