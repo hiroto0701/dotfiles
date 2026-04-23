@@ -1,0 +1,7 @@
+customCommands:
+  - key: '<c-g>'
+    context: 'files'
+    description: 'Generate commit message with Claude'
+    output: 'terminal'
+    command: |
+      MSG=$(git diff --cached | claude --no-session-persistence --print --model haiku 'Generate ONLY a one-line Git commit message following Conventional Commits format: type(scope): 日本語の説明. Types: feat, fix, docs, style, refactor, test, chore, perf. The description MUST be written in Japanese. Based strictly on the diff from stdin. Output ONLY the message, nothing else.') && git commit -e -m "$MSG"
