@@ -10,7 +10,10 @@
       "splitRight": "cmd+\\",
       "splitDown": "cmd+-",
       "splitBrowserRight": "cmd+shift+\\",
-      "splitBrowserDown": "cmd+shift+-"
+      "splitBrowserDown": "cmd+shift+-",
+      "browserZoomIn": "ctrl+=",
+      "browserZoomOut": "ctrl+-",
+      "browserZoomReset": "cmd+0"
     }
   }
 }
