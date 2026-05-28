@@ -74,3 +74,6 @@ unfocused-split-opacity = 0.8
 
 # title-bar-settings
 macos-titlebar-style = "tabs"
+
+# keyboard
+macos-option-as-alt = true
