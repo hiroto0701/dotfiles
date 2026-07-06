@@ -1,0 +1,94 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[ui]
+agent_panel_sort = "spaces"
+
+[theme]
+name = "catppuccin"
+auto_switch = false
+
+# キーマップ設定
+# 実デフォルト一覧は `herdr --default-config` で確認できる
+# 空文字 "" は「未割り当て」を意味する（必要なら好きなキーを設定する）
+[keys]
+# プレフィックスキー（tmux スタイルで ctrl+a に変更。herdr デフォルトは ctrl+b）
+# "prefix+n" はプレフィックス必須、"ctrl+alt+n" は直接ショートカット
+prefix = "ctrl+a"
+
+# --- プレフィックスモードのアクション ---
+help = "prefix+?"
+settings = "prefix+s"
+detach = "prefix+q"
+reload_config = "prefix+shift+r"
+open_notification_target = "prefix+o"
+
+# --- ワークスペース ---
+workspace_picker = "prefix+w"
+goto = "prefix+g"
+new_workspace = "prefix+shift+n"
+new_worktree = "prefix+shift+g"
+open_worktree = ""
+remove_worktree = ""
+rename_workspace = "prefix+shift+w"
+close_workspace = "prefix+shift+d"
+previous_workspace = ""
+next_workspace = ""
+switch_workspace = ""
+
+# --- エージェント ---
+previous_agent = ""
+next_agent = ""
+focus_agent = ""
+
+# --- タブ ---
+new_tab = "prefix+c"
+rename_tab = "prefix+shift+t"
+previous_tab = "prefix+p"
+next_tab = "prefix+n"
+switch_tab = "prefix+1..9"
+close_tab = "prefix+shift+x"
+
+# --- ペイン ---
+rename_pane = "prefix+shift+p"
+edit_scrollback = "prefix+e"
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+cycle_pane_next = "prefix+tab"
+cycle_pane_previous = "prefix+shift+tab"
+last_pane = ""
+split_vertical = "prefix+v"
+split_horizontal = "prefix+minus"
+close_pane = "prefix+x"
+zoom = "prefix+z"
+resize_mode = "prefix+r"
+toggle_sidebar = "prefix+b"
+
+# --- リモート ---
+remote_image_paste = "ctrl+v"
+
+# --- ナビゲートモードの移動（プレフィックス不要。navigate mode 中のみ有効）---
+navigate_workspace_up = "up"
+navigate_workspace_down = "down"
+navigate_pane_left = "h"
+navigate_pane_down = "j"
+navigate_pane_up = "k"
+navigate_pane_right = "l"
+
+# --- カスタムコマンド ---
+# type = "pane" は一時ペインで実行しコマンド終了時に閉じる / "shell" はバックグラウンド実行
+[[keys.command]]
+key = "prefix+alt+g"
+type = "pane"
+command = "lazygit"
+description = "lazygit を起動"
+
+[[keys.command]]
+key = "prefix+alt+f"
+type = "pane"
+command = "yazi"
+description = "yazi ファイラを起動"
