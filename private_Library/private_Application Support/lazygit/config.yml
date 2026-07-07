@@ -1,3 +1,7 @@
+gui:
+  # シェルのロケール(LANG)に依存せず lazygit の表示を日本語に固定
+  language: 'ja'
+
 customCommands:
   - key: '<c-g>'
     context: 'files'
