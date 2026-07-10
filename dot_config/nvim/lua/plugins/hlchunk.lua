@@ -1,41 +1,50 @@
 return {
-  "shellRaining/hlchunk.nvim",
-  event = { "BufReadPre", "BufNewFile" },
-  config = function()
-    require("hlchunk").setup({
-      chunk = {
-        enable = true,
-        notify = true,
-        priority = 15,
-        style = {
-          { fg = "#ffffff" },
-          { fg = "#ffffff" },
+  {
+    "shellRaining/hlchunk.nvim",
+    event = { "BufReadPre", "BufNewFile" },
+    config = function()
+      require("hlchunk").setup({
+        chunk = {
+          enable = true,
+          notify = true,
+          priority = 15,
+          style = {
+            { fg = "#ffffff" },
+            { fg = "#ffffff" },
+          },
+          use_treesitter = true,
+          chars = {
+            horizontal_line = "─",
+            vertical_line = "│",
+            left_top = "╭",
+            left_bottom = "╰",
+            right_arrow = ">",
+          },
+          textobject = "",
+          max_file_size = 1024 * 1024,
+          error_sign = true,
         },
-        use_treesitter = true,
-        chars = {
-          horizontal_line = "─",
-          vertical_line = "│",
-          left_top = "╭",
-          left_bottom = "╰",
-          right_arrow = ">",
+        indent = {
+          enable = true,
+          priority = 10,
+          style = {
+            { fg = "#3b4261" },
+          },
+          chars = {
+            "│",
+          },
         },
-        textobject = "",
-        max_file_size = 1024 * 1024,
-        error_sign = true,
-      },
-      indent = {
-        enable = true,
-        priority = 10,
-        style = {
-          { fg = "#3b4261" },
+        line_num = {
+          style = "#806d9c",
         },
-        chars = {
-          "│",
-        },
-      },
-      line_num = {
-        style = "#806d9c",
-      },
-    })
-  end,
+      })
+    end,
+  },
+  -- hlchunk の indent 表示と二重にならないよう snacks.nvim の indent を無効化
+  {
+    "folke/snacks.nvim",
+    opts = {
+      indent = { enabled = false },
+    },
+  },
 }
