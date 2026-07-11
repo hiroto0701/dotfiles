@@ -107,6 +107,23 @@ nvimrepo() {
   fi
 }
 
+# nvim設定の変更をchezmoiソースに取り込んでコミット
+nvim-sync() {
+  local src=$(chezmoi source-path)
+  chezmoi add "$HOME/.config/nvim" || return 1
+  local changed=$(git -C "$src" status --porcelain -- dot_config/nvim)
+  if [ -z "$changed" ]; then
+    echo "変更なし"
+    return 0
+  fi
+  git -C "$src" add -- dot_config/nvim
+  local msg="chore(nvim): 設定変更を chezmoi に同期"
+  if [ "$(echo "$changed" | awk '{print $2}' | sort -u)" = "dot_config/nvim/lazy-lock.json" ]; then
+    msg="chore(nvim): プラグインロックを更新"
+  fi
+  git -C "$src" commit -q -m "$msg" -- dot_config/nvim && git -C "$src" log --oneline -1
+}
+
 # cdev: 開発レイアウトで起動
 # Usage: cdev [directory]  e.g. cdev ~/project/myapp
 cdev() {
@@ -149,3 +166,4 @@ alias l='lsd -l'
 alias la='lsd -a'
 alias lla='lsd -la'
 alias lt='lsd --tree'
+alias nv='nvim'
