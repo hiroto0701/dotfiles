@@ -92,3 +92,11 @@ map("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename" })
 map("n", "<C-p>", function()
   Snacks.picker.files()
 end, { desc = "Find Files" })
+
+-- 外部ツール
+map("n", "<leader>ds", function()
+  Snacks.terminal.toggle("lazysql")
+end, { desc = "Lazysql" })
+map("n", "<leader>dd", function()
+  Snacks.terminal.toggle("lazydocker")
+end, { desc = "Lazydocker" })
