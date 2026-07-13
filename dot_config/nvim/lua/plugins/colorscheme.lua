@@ -5,6 +5,12 @@ return {
     opts = {
       flavour = "mocha",
       transparent_background = true,
+      custom_highlights = function(colors)
+        return {
+          LineNr = { fg = colors.overlay1 },
+          CursorLineNr = { fg = colors.yellow, bg = colors.surface1, style = { "bold" } },
+        }
+      end,
       integrations = {
         gitsigns = true,
         mason = true,
