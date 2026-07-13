@@ -34,8 +34,8 @@ open_worktree = ""
 remove_worktree = ""
 rename_workspace = "prefix+shift+w"
 close_workspace = "prefix+shift+d"
-previous_workspace = ""
-next_workspace = ""
+previous_workspace = "prefix+["
+next_workspace = "prefix+]"
 switch_workspace = ""
 
 # --- エージェント ---
