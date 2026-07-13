@@ -52,7 +52,7 @@
 theme = TokyoNight Storm
 
 # font-settings
-font-family = FiraCode 
+font-family = FiraCode
 font-size = 11
 font-thicken = true
 font-style = Regular
