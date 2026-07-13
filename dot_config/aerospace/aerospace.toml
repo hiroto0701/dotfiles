@@ -45,7 +45,7 @@ automatically-unhide-macos-hidden-apps = false
 # even when they are invisible.
 # This config version is only available since 'config-version = 2'
 # Fallback value (if you omit the key): persistent-workspaces = []
-persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9"]
+persistent-workspaces = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "S", "T", "O", "G"]
 
 # A callback that runs every time binding mode changes
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
@@ -148,6 +148,16 @@ on-mode-changed = []
     alt-shift-8 = 'move-node-to-workspace 8'
     alt-shift-9 = 'move-node-to-workspace 9'
 
+    # アプリ専用ワークスペース（S=Slack, T=Teams, O=Outlook, G=Ghostty）
+    alt-s = 'workspace S'
+    alt-t = 'workspace T'
+    alt-o = 'workspace O'
+    alt-g = 'workspace G'
+    alt-shift-s = 'move-node-to-workspace S'
+    alt-shift-t = 'move-node-to-workspace T'
+    alt-shift-o = 'move-node-to-workspace O'
+    alt-shift-g = 'move-node-to-workspace G'
+
     # See: https://nikitabobko.github.io/AeroSpace/commands#workspace-back-and-forth
     alt-tab = 'workspace-back-and-forth'
     # See: https://nikitabobko.github.io/AeroSpace/commands#move-workspace-to-monitor
@@ -172,6 +182,23 @@ on-mode-changed = []
     alt-shift-k = ['join-with up', 'mode main']
     alt-shift-l = ['join-with right', 'mode main']
 
+# アプリが開いたら専用ワークスペースへ自動移動
+[[on-window-detected]]
+if.app-id = 'com.tinyspeck.slackmacgap'
+run = 'move-node-to-workspace S'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.teams2'
+run = 'move-node-to-workspace T'
+
+[[on-window-detected]]
+if.app-id = 'com.microsoft.Outlook'
+run = 'move-node-to-workspace O'
+
+[[on-window-detected]]
+if.app-id = 'com.mitchellh.ghostty'
+run = 'move-node-to-workspace G'
+
 # Assign workspaces to monitors
 # 1-5: main monitor, 6-9: secondary (fallback to main if no external monitor)
 [workspace-to-monitor-force-assignment]
@@ -184,3 +211,7 @@ on-mode-changed = []
     7 = ['secondary', 'main']
     8 = ['secondary', 'main']
     9 = ['secondary', 'main']
+    S = ['secondary', 'main']
+    T = ['secondary', 'main']
+    O = ['secondary', 'main']
+    G = ['secondary', 'main']
