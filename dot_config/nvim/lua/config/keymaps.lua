@@ -8,7 +8,12 @@ local map = vim.keymap.set
 map("n", "<Tab>", "<Cmd>BufferLineCycleNext<CR>", { silent = true, desc = "次のバッファへ" })
 map("n", "<S-Tab>", "<Cmd>BufferLineCyclePrev<CR>", { silent = true, desc = "前のバッファへ" })
 for i = 1, 9 do
-  map("n", "<leader>" .. i, "<Cmd>BufferLineGoToBuffer " .. i .. "<CR>", { silent = true, desc = "バッファ" .. i .. "へ" })
+  map(
+    "n",
+    "<leader>" .. i,
+    "<Cmd>BufferLineGoToBuffer " .. i .. "<CR>",
+    { silent = true, desc = "バッファ" .. i .. "へ" }
+  )
 end
 map("n", "<leader>x", function()
   Snacks.bufdelete()
