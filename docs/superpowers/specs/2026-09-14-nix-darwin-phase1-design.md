@@ -128,13 +128,20 @@ Phase 1 では nix-darwin を導入し、この 2 層を宣言的に管理する
   system.stateVersion = 7;
   system.configurationRevision = self.rev or self.dirtyRev or null;
 
-  # defaults write 後にログアウト無しで反映される項目を増やす
+  # defaults write 後にログアウト無しで反映される項目を増やす。
+  # activation script は set -e で動くため、失敗しても activation を止めないようにする
   system.activationScripts.postActivation.text = ''
-    sudo -u ${username} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
+    launchctl asuser "$(id -u -- ${username})" sudo --user=${username} -- \
+      /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u \
+      || echo >&2 "warning: activateSettings -u failed (ignored)"
   '';
 }
 ```
 
+- `postActivation` の実行形式は nix-darwin が `defaults write` に使う
+  `launchctl asuser "$(id -u -- <user>)" sudo --user=<user> -- <cmd>`（`modules/system/defaults-write.nix`）に揃える。
+  activation script は `set -e` で動く（`modules/system/activation-scripts.nix`）ため、素の呼び出しが失敗すると
+  `/run/current-system` の更新前に activation が中断する。`|| echo` で握る（プラン作成時に判明し訂正）。
 - `ids.gids.nixbld` は `stateVersion >= 5` で既定 350。Determinate Nix Installer が作る gid と一致するので設定不要。
 - `environment.systemPackages` は空。Phase 1 では nix でパッケージを入れない。
 - `programs.zsh.enable` は既定 true のまま。nix-darwin が `/etc/zshenv` `/etc/zprofile` `/etc/zshrc` を生成する。
@@ -311,6 +318,11 @@ README.md
 PATH を全消しするため、対話シェルで `nix` と `darwin-rebuild` が見つからなくなる。
 末尾に `:$PATH` を足す（既存の順序は維持、nix のパスが後ろに残る）。Phase 1 で dotfiles に触る唯一の箇所。
 
+注意: `~/.zshrc` にはソース未反映のローカル変更（末尾の mise 初期化行）がある（`chezmoi status` で `MM`）。
+15 行目を直す前に `chezmoi add ~/.zshrc` で取り込み、別コミットにする。`~/.config/herdr/config.toml` も同様に
+`MM` だがスコープ外なので触らない。そのため `chezmoi apply` は常にターゲット指定（`chezmoi apply ~/.zshrc`）で
+実行し、引数無しの全体 apply は行わない。
+
 ## 5. 管理対象の macOS 設定（棚卸し結果）
 
 判定基準: plist にキーが存在する = 一度は手で触った。
@@ -353,9 +365,9 @@ PATH を全消しするため、対話シェルで `nix` と `darwin-rebuild` �
 | 0 | 会社ポリシー確認（Intune 管理下で `/nix` ボリュームと LaunchDaemon の作成が問題ないか）。現在の defaults 全 domain を `~/defaults-before-nix-darwin.txt` にダンプ。社内パスを含むので **repo には入れない** | ファイル存在 |
 | 1 | `.chezmoiignore` 追加、`~/README.md` `~/docs/` を削除 | `chezmoi managed` に出ない |
 | 2 | Determinate Nix インストール: `curl -fsSL https://install.determinate.systems/nix \| sh -s -- install` | `nix --version`、`/nix` マウント |
-| 3 | flake 骨格（`flake.nix` + `darwin/default.nix`、`defaults.nix` と `homebrew.nix` は空モジュール）。`git add` → `nix run nix-darwin/master#darwin-rebuild -- build --flake ~/.local/share/chezmoi/nix` → `sudo nix run nix-darwin/master#darwin-rebuild -- check --flake ~/.local/share/chezmoi/nix` → 初回 `sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/.local/share/chezmoi/nix`。この段階では `darwin-rebuild` が PATH に無いので `nix run` 経由。以後は `sudo darwin-rebuild ...` | `darwin-version`、`/etc/zshrc` が nix-darwin 生成に置換。`dot_zshrc` 修正 + `chezmoi apply` 後に新シェルで `darwin-rebuild` が見える |
+| 3 | flake 骨格（`flake.nix` + `darwin/default.nix`、`defaults.nix` と `homebrew.nix` は空モジュール）。`git add` → `nix build --no-link ~/.local/share/chezmoi/nix#darwinConfigurations.BNMAC00101.system`（`darwin-rebuild build` は cwd に `result` リンクを作り、chezmoi ソース内に置かれると `~/result` の管理対象になるため使わない）→ `sudo nix run nix-darwin/master#darwin-rebuild -- check --flake ~/.local/share/chezmoi/nix` → 初回 `sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/.local/share/chezmoi/nix`。この段階では `darwin-rebuild` が PATH に無いので `nix run` 経由。以後は `sudo darwin-rebuild ...` | `darwin-version`、`/etc/zshrc` が nix-darwin 生成に置換。`dot_zshrc` 修正 + `chezmoi apply` 後に新シェルで `darwin-rebuild` が見える |
 | 4 | `defaults.nix` 投入 → build → `sudo darwin-rebuild switch --flake ~/.local/share/chezmoi/nix` | 各 domain を `defaults read` で読み戻して一致。ログアウト / ログイン後に体感確認 |
-| 5 | `homebrew.nix` 投入 → build → `nix eval --raw ~/.local/share/chezmoi/nix#darwinConfigurations.BNMAC00101.config.homebrew.brewfile > "$TMPDIR/Brewfile"` で生成 Brewfile を取り出し、`brew bundle cleanup --file="$TMPDIR/Brewfile"`（`--force` 無し）で削除予定を目視 → switch | `brew leaves` / `brew tap` / `brew list --cask` が宣言と一致、`brew services list` で borders が started |
+| 5 | `homebrew.nix` 投入 → build → `nix eval --raw ~/.local/share/chezmoi/nix#darwinConfigurations.BNMAC00101.config.homebrew.brewfile > "${TMPDIR:-/tmp}/Brewfile"` で生成 Brewfile を取り出す → `brew trust --tap daipeihust/tap felixkratz/formulae jesseduffield/lazydocker nikitabobko/tap oven-sh/bun` で宣言する tap を先に信頼（未信頼のままだと dry-run から formula が落ちる。§8.1）→ `brew bundle cleanup --file="${TMPDIR:-/tmp}/Brewfile"`（`--force` 無し）で削除予定を目視 → switch | `brew leaves` / `brew tap` / `brew list --cask` が宣言と一致、`brew services list` で borders が started |
 | 6 | `sudo darwin-rebuild --rollback` で世代を 1 つ戻し、再 switch で戻す | 世代の往復が成功 |
 
 各ステップでコミットする。
@@ -373,7 +385,7 @@ PATH を全消しするため、対話シェルで `nix` と `darwin-rebuild` �
 
 | 階層 | 手段 | 何を検出するか |
 |---|---|---|
-| 型・存在 | `darwin-rebuild build` | 未知オプション、型違い |
+| 型・存在 | `nix build --no-link <flake>#darwinConfigurations.BNMAC00101.system` | 未知オプション、型違い |
 | 事前 | `darwin-rebuild check` | `/etc` の衝突、nixbld gid、primaryUser 未設定 |
 | brew dry-run | `nix eval --raw <flake>#darwinConfigurations.BNMAC00101.config.homebrew.brewfile` で Brewfile を取り出し、`brew bundle cleanup --file=...`（`--force` 無し） | 削除される formula / cask / tap の一覧 |
 | 事後 | `defaults read` の読み戻し、`brew leaves` / `brew tap` / `brew list --cask` / `brew services list` | 宣言と実機の一致 |
@@ -417,7 +429,11 @@ borders（ウィンドウ枠、`brew services` で常駐中）が消えていた
 - `homebrew` モジュールは Homebrew 本体を入れない。`taps.*.trusted` / `clone_target`、
   `brews.*.link` / `start_service` に対応
 - 生成 Brewfile は `homebrew.brewfile` オプションとして `nix eval --raw` で取り出せる。
-  switch 後は `HOMEBREW_BUNDLE_FILE` が store 内の Brewfile を指す
+  `HOMEBREW_BUNDLE_FILE` を store 内の Brewfile に向けるには `homebrew.global.brewfile = true` が必要
+  （既定 false）。本設計では設定しない
+- Homebrew 7.0.1 の tap 信頼機構: 未信頼 tap の formula は読み込み拒否され `brew leaves` /
+  `brew bundle dump` / `brew services list` から落ちる。`brew trust --tap <tap>` で信頼付与
+  （`~/.homebrew/trust.json`）。nix-darwin の `taps.*.trusted = true` は Brewfile に `trusted: true` を出す
 - `environment.systemPath` の既定は `/run/current-system/sw` と `/nix/var/nix/profiles/default`。
   `nix.enable = false` でも両方の `bin` が PATH に入る
 - `darwin-rebuild` は `scutil --get LocalHostName` を既定の設定名にする。`--rollback` あり。
