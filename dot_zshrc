@@ -170,3 +170,5 @@ alias nv='nvim'
 alias lg='lazygit'
 alias ld='lazydocker'
 alias lsql='lazysql'
+
+eval "$(/Users/mac83009105/.local/bin/mise activate zsh)" # added by https://mise.run/zsh
