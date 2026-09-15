@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "keybindings": {},
+  "platforms": {
+    "darwin": {
+      "terminal.splitRight": ["Mod+Backslash"],
+      "terminal.splitDown": ["Mod+Minus"],
+      "terminal.focusNextPane": ["Mod+L", "Mod+J"],
+      "terminal.focusPreviousPane": ["Mod+H", "Mod+K"]
+    }
+  }
+}
