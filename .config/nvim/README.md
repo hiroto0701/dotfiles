@@ -4,7 +4,7 @@
 
 ## 構成
 
-- `lazyvim.json` -- 有効化済み extras（typescript / biome / json / docker / prisma / markdown / prettier / eslint / chezmoi）
+- `lazyvim.json` -- 有効化済み extras（typescript / biome / json / docker / prisma / markdown / prettier / eslint）
 - `lua/config/options.lua` -- LazyVim デフォルトとの差分のみ（cursorlineopt 等）
 - `lua/config/keymaps.lua` -- 旧環境から移植したキーマップ（`,` プレフィックスの Snacks Picker、bufferline 操作、`<C-p>`、`<leader>rn`）
 - `lua/plugins/` -- 持ち込みプラグインと上書き設定
