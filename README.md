@@ -1,16 +1,25 @@
 # Inagaki Dotfiles
 
-このリポジトリは [chezmoi](https://www.chezmoi.io/) を使用して dotfiles を管理しています。
+macOS の設定、Homebrew、dotfiles を [nix-darwin](https://github.com/nix-darwin/nix-darwin) と
+[home-manager](https://github.com/nix-community/home-manager) で宣言管理しています。
+
+dotfiles の実体はこのリポジトリ（`~/dotfiles`）に 1 つだけあり、ホームディレクトリ側の
+`~/.zshrc` や `~/.config/nvim` はそこを指す symlink です。リポジトリのファイルを編集すると、
+そのまま実機に反映されます。「適用」という工程はありません。
 
 ## 概要
 
 この dotfiles には以下の設定が含まれています
 
+- **nix-darwin**: macOS の `defaults`（Dock、Finder、トラックパッド、キーボードなど）と Homebrew の formula / cask を宣言
+- **home-manager**: dotfiles の symlink 配置
+- **nix-homebrew**: Homebrew 本体のインストールとバージョン固定、tap の信頼設定
 - **zinit**: Zsh プラグインマネージャー
 - **Powerlevel10k**: Zsh テーマ
 - **Neovim**: テキストエディタ（Lazy.nvim でプラグイン管理）
 - **ghostty**: ターミナルエミュレーター
 - **wezterm**: ターミナルエミュレーター
+- **aerospace**: タイル型ウィンドウマネージャー（[キーバインド一覧](.config/aerospace/KEYBINDS.md)）
 - **fzf**: ファジーファインダー（fd と組み合わせて使用）
 - **zoxide**: スマートなディレクトリナビゲーション（`z` コマンドで頻繁に訪問したディレクトリへ素早く移動）
 - **bat**: モダンな `cat` コマンドの代替ツール（fzf のプレビューで使用）
@@ -18,201 +27,179 @@
 - **gh**: GitHub CLI（GitHub の操作をコマンドラインから実行）
 - **lsd**: モダンな `ls` コマンドの代替ツール
 - **yazi**: ターミナルファイルマネージャー（[キーバインド一覧](docs/yazi-keybindings.md)）
-- **Homebrew**: パッケージマネージャー（前提条件）
+- **lazygit**: Git の TUI クライアント
+
+## リポジトリ構成
+
+リポジトリのパスはホームディレクトリの鏡写しです。`~/dotfiles/.config/nvim` が `~/.config/nvim` になります。
+
+```text
+~/dotfiles/
+├── .config/
+│   ├── aerospace/                # ディレクトリ単位で symlink
+│   ├── ghostty/
+│   ├── nvim/                     # lazy-lock.json の更新もそのままここに落ちる
+│   ├── wezterm/
+│   ├── yazi/
+│   ├── cmux/settings.json        # ファイル単位（隣にアプリがランタイムファイルを書くため）
+│   ├── herdr/config.toml
+│   └── orca/keybindings.json     # 配置先は ~/.orca/keybindings.json（Orca は XDG 非対応）
+├── .claude/skills/               # Claude Code のスキル 2 つ
+├── .local/bin/difit-cmux
+├── Library/Application Support/lazygit/config.yml
+├── .zshrc, .zprofile, .p10k.zsh
+├── nix/
+│   ├── flake.nix                 # ホスト一覧、home-manager と nix-homebrew の組み込み
+│   ├── darwin/
+│   │   ├── default.nix           # ホスト共通の土台
+│   │   ├── defaults.nix          # macOS の system.defaults
+│   │   └── homebrew.nix          # tap / formula / cask の宣言
+│   └── home/
+│       ├── default.nix
+│       └── dotfiles.nix          # source と target の対応表
+├── docs/
+└── README.md
+```
+
+symlink の対応表は `nix/home/dotfiles.nix` にあります。どのファイルがどこに置かれるかはこのファイルを見れば分かります。
 
 ## 前提条件
 
-- macOS（Homebrew が使用可能な環境）
-- Git がインストールされていること
-- GitHub への SSH 接続が設定されていること（SSH キーが GitHub アカウントに登録されている必要があります）
+- macOS（Apple Silicon）
+- 管理者権限（`sudo` が使えること）
 
-## セットアップ手順
+Homebrew も git も事前に入れる必要はありません。
 
-### 1. Homebrew のインストール
+## セットアップ手順（新しい Mac）
 
-Homebrew がインストールされていない場合は、以下のコマンドでインストールします
+### 1. Determinate Nix をインストール
 
 ```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+curl -fsSL https://install.determinate.systems/nix | sh -s -- install
 ```
 
-### 2. chezmoi のインストール
+完了後、新しいターミナルを開きます。
 
-Homebrew を使用して chezmoi をインストールします
+### 2. リポジトリを clone
 
 ```bash
-brew install chezmoi
+nix run nixpkgs#git -- clone https://github.com/hiroto0701/dotfiles ~/dotfiles
 ```
 
-### 3. リポジトリのクローンと適用
+配置先は `~/dotfiles` 固定です。symlink がこの絶対パスを指すため、別の場所には置けません。
+public リポジトリなので鍵は不要です。SSH 鍵を入れた後で remote を `git@github.com:hiroto0701/dotfiles.git` に切り替えてください。
 
-chezmoi を使用してこのリポジトリをクローンし、設定を適用します（SSH 接続を使用）
+### 3. ホスト名を登録
 
-```bash
-chezmoi init --apply git@github.com:hiroto0701/dotfiles.git
+ホスト名が `BNMAC00101` 以外なら、`nix/flake.nix` の `hosts` に 1 行足して `git add` します。
+
+```nix
+hosts = {
+  BNMAC00101 = { user = "mac83009105"; };
+  <ホスト名> = { user = "<ユーザー名>"; };
+};
 ```
 
-または、既存のリポジトリをローカルにクローンしている場合は、そのリポジトリのパスを指定します：
+ホスト名は `scutil --get LocalHostName` で確認できます。flake は git 追跡ファイルしか見ないので `git add nix/flake.nix` を忘れないでください。
+
+### 4. switch
 
 ```bash
-# 例: ホームディレクトリにクローンした場合
-chezmoi init ~/dotfiles
-chezmoi apply
-
-# 例: 現在のディレクトリにクローンした場合
-chezmoi init ./dotfiles
-chezmoi apply
-
-# 例: 絶対パスで指定する場合
-chezmoi init /Users/username/dotfiles
-chezmoi apply
+sudo nix run nix-darwin/master#darwin-rebuild -- switch --flake ~/dotfiles/nix#<ホスト名>
 ```
 
-**注意** GitHub への接続は SSH で行う前提です。SSH キーが設定されていない場合は、事前に設定してください
+この 1 回で Homebrew 本体、formula / cask、macOS の defaults、dotfiles の symlink が全て入ります。
 
-### 4. yazi のインストール
-
-yazi とその依存ツールをインストールします
+初回は `/nix/var/nix/profiles/system` が作られないことがあります。`ls /nix/var/nix/profiles/` に `system` が無ければ次で世代 1 を作ってください。
 
 ```bash
-brew install yazi ffmpeg-full sevenzip jq poppler fd ripgrep fzf zoxide resvg imagemagick-full font-symbols-only-nerd-font
-brew link ffmpeg-full imagemagick-full -f --overwrite
+sudo nix-env -p /nix/var/nix/profiles/system --set "$(readlink /run/current-system)"
 ```
 
-キーバインドの詳細は [docs/yazi-keybindings.md](docs/yazi-keybindings.md) を参照してください。
+### 5. ログアウト / ログイン
 
-### 5. その他の依存ツールのインストール
+`defaults` の一部（Caps Lock での IME 切替、トラックパッドのジェスチャなど）はログイン後に確定します。
 
-以下のツールを Homebrew でインストールします
+### 6. 初回起動での自動セットアップ
+
+- 最初のシェル起動で zinit が自身を clone してプラグインを入れます
+- 最初の `nvim` 起動で lazy.nvim がプラグインを入れます
+- `ya pkg install` で yazi のプラグインを入れます
+
+### 手作業で残るもの
+
+- SSH 鍵
+- TCC 権限（Accessibility、Input Monitoring）
+- アプリのログイン
+- cask 化していない GUI アプリ（Orca、Raycast、Logi Options+、Chrome、Cursor、Docker Desktop）
+- nodebrew / volta / pyenv / mise で入れているランタイム
+
+## 日常の運用
+
+### 設定ファイルの編集
+
+`~/.config/nvim/init.lua` でも `~/dotfiles/.config/nvim/init.lua` でも同じファイルです。編集したらコミットするだけです。
 
 ```bash
-# fzf（ファジーファインダー）
-brew install fzf
-
-# zoxide（スマートなディレクトリナビゲーション）
-brew install zoxide
-
-# fd（fzf と組み合わせて使用する高速な find コマンド）
-brew install fd
-
-# bat（モダンな cat コマンドの代替ツール、fzf のプレビューで使用）
-brew install bat
-
-# ghq（Git リポジトリ管理ツール）
-brew install ghq
-
-# gh（GitHub CLI）
-brew install gh
-
-# lsd（モダンな ls コマンドの代替ツール）
-brew install lsd
-
-# neovim（テキストエディタ）
-brew install neovim
-
-# im-select（IME制御ツール）
-brew tap daipeihust/tap
-brew install im-select
-
-# lazy-git（GUIでgit操作できるようにするツール）
-brew install lazygit
-
-# aerospace(window manager)
-brew install --cask nikitabobko/tap/aerospace
-
-# jankyborders(アクティブウィンドウを目立たせる)
-brew tap FelixKratz/formulae
-brew install borders
-
-# alt-tab
-brew install --cask alt-tab
-
-# その他のツール（必要に応じて）
-brew install pyenv
-brew install volta
-brew install nodebrew
+cd ~/dotfiles
+git status
+git add .config/nvim
+git commit -m "chore(nvim): ..."
 ```
 
-### 6. fzf のセットアップ
-
-fzf のキーバインドと補完機能を有効化します（既に `.zshrc` に設定済みですが、初回は手動で実行）
+Neovim のプラグイン更新（`lazy-lock.json` の変更）は `.zshrc` の `nvim-sync` でコミットできます。
 
 ```bash
-$(brew --prefix)/opt/fzf/install
+nvim-sync
 ```
 
-**注意** fzf のプレビューには `bat` が使用されるように設定されています。ファイルを選択すると、bat でシンタックスハイライト付きでプレビューが表示されます
+### 宣言の変更（defaults / Homebrew / symlink の対応表）
 
-### 7. ghq の使い方
-
-ghq は Git リポジトリを一元管理するツールです。以下のカスタム関数が `.zshrc` に定義されています
-
-- **`cdrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリに移動します
-- **`cursorrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを Cursor で開きます
-- **`nvimrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを NeoVim で開きます
-
-使用例
+`nix/` 配下を編集し、新規ファイルは `git add` してから switch します。
 
 ```bash
-# リポジトリをクローン（ghq が自動的に管理）
-ghq get https://github.com/user/repo.git
-
-# リポジトリ一覧を表示
-ghq list
-
-# fzf でリポジトリを検索して移動
-cdrepo
-
-# fzf でリポジトリを検索して Cursor で開く
-cursorrepo
-
-# fzf でリポジトリを検索して NeoVim で開く
-nvimrepo
+sudo darwin-rebuild switch --flake ~/dotfiles/nix
 ```
 
-### 8. lsd のエイリアス
+新しい設定ファイルを管理下に置くときは、リポジトリの鏡写し位置にファイルを置き、
+`nix/home/dotfiles.nix` に 1 行足して switch します。既にホーム側に同じパスの実ファイルがある場合は
+`<パス>.hm-backup` に退避されてから symlink が置かれます。中身を確認したら退避ファイルは消してください。
 
-lsd は `ls` コマンドのモダンな代替ツールで、以下のエイリアスが `.zshrc` に設定されています
-
-- **`ls`**: `lsd` にエイリアスされています（デフォルトでカラー表示とアイコン表示）
-- **`l`**: `lsd -l` - 詳細表示
-- **`la`**: `lsd -a` - 隠しファイルを含む表示
-- **`lla`**: `lsd -la` - 隠しファイルを含む詳細表示
-- **`lt`**: `lsd --tree` - ツリー形式で表示
-
-使用例
+### 入力（nixpkgs / nix-darwin / home-manager / Homebrew 本体）の更新
 
 ```bash
-# 通常のリスト表示（カラーとアイコン付き）
-ls
-
-# 詳細表示
-l
-
-# 隠しファイルを含む表示
-la
-
-# 隠しファイルを含む詳細表示
-lla
-
-# ツリー形式で表示
-lt
+nix flake update --flake ~/dotfiles/nix
+sudo darwin-rebuild switch --flake ~/dotfiles/nix
 ```
 
-### 9. 新しいシェルセッションの開始
+Homebrew 本体のバージョンは `nix/flake.nix` の `brew-src` input（`github:Homebrew/brew/<バージョン>`）で固定しているため、`brew update` では上がりません。
+上げるには `brew-src` の ref と `nix-homebrew.package` の `name` / `version` を新しいバージョンに変えてコミットし、switch します。
+`brew --version` は版を表示しません（Homebrew の管理リポジトリが Nix 側にあるため）。入っている版は `readlink /opt/homebrew/Library/Homebrew` の store パス名で確認できます。
 
-新しいターミナルウィンドウを開くか、以下のコマンドで設定を再読み込みします
+### ロールバック
 
 ```bash
-source ~/.zshrc
+sudo darwin-rebuild --rollback
 ```
 
-### 10. Powerlevel10k の設定（初回のみ）
+戻るのは nix-darwin の activation（`/etc`、defaults の書き込み、`brew bundle` の実行）だけです。
 
-初回起動時に Powerlevel10k の設定ウィザードが表示される場合があります。好みに応じて設定してください
+- home-manager が置いた symlink は前の世代に戻しても残ります
+- Homebrew の formula / cask は前の世代の宣言で `brew bundle` が走り、その宣言に合わせて増減します
+- nix-homebrew による Homebrew 本体の管理も戻りません（Cellar / Caskroom は保たれます）
+
+symlink を実ファイルに戻すには、退避ファイルが残っていれば次のように手で戻します。
 
 ```bash
-p10k configure
+rm ~/.zshrc
+mv ~/.zshrc.hm-backup ~/.zshrc
+```
+
+退避ファイルを消した後なら、symlink を消してリポジトリからコピーします。
+
+```bash
+rm ~/.zshrc
+cp ~/dotfiles/.zshrc ~/.zshrc
 ```
 
 ## 含まれているツールとプラグイン
@@ -226,18 +213,19 @@ p10k configure
 - **zsh-users/zsh-completions**: 追加の補完機能
 - **zdharma/history-search-multi-word**: マルチワード履歴検索
 
-### その他のツール
+### ghq のカスタム関数（`.zshrc`）
 
-- **fzf**: ファジーファインダー（ファイル検索、履歴検索など）
-- **zoxide**: スマートなディレクトリナビゲーション（`z` コマンドで訪問履歴から素早く移動）
-- **fd**: 高速なファイル検索ツール（fzf と組み合わせて使用）
-- **bat**: モダンな `cat` コマンドの代替ツール（シンタックスハイライト、fzf のプレビューで使用）
-- **ghq**: Git リポジトリ管理ツール（fzf と組み合わせてリポジトリを検索・移動）
-- **gh**: GitHub CLI（Issue、PR の作成・管理、リポジトリ操作などを CLI から実行）
-- **lsd**: モダンな `ls` コマンドの代替ツール（アイコン表示、カラー出力など）
-- **neovim**: モダンなテキストエディタ（Lazy.nvim でプラグイン管理）
-- **ghostty**: モダンなターミナルエミュレーター
-- **wezterm**: クロスプラットフォームなターミナルエミュレーター
+- **`cdrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリに移動します
+- **`cursorrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを Cursor で開きます
+- **`nvimrepo`**: fzf を使ってリポジトリを検索し、選択したリポジトリを NeoVim で開きます
+
+### lsd のエイリアス（`.zshrc`）
+
+- **`ls`**: `lsd`
+- **`l`**: `lsd -l`
+- **`la`**: `lsd -a`
+- **`lla`**: `lsd -la`
+- **`lt`**: `lsd --tree`
 
 ### Neovim プラグイン（Lazy.nvim 経由）
 
@@ -249,271 +237,17 @@ p10k configure
 - **nvim-lspconfig**: LSP 設定
 - **im-select.nvim**: IME 自動切り替え（ノーマルモード時に英語入力へ自動切替）
 
-## chezmoi チートシート
-
-### 基本的な操作
-
-```bash
-# 設定ファイルを適用する
-chezmoi apply
-
-# 設定ファイルの状態を確認する
-chezmoi status
-
-# 設定ファイルの差分を確認する
-chezmoi diff
-
-# リモートリポジトリから最新の変更を取得して適用する
-chezmoi update
-
-# 管理されているファイルの一覧を表示する
-chezmoi managed
-```
-
-### ファイルの追加・編集
-
-```bash
-# 新しいファイルを chezmoi で管理する
-chezmoi add ~/.example
-
-# 既存のファイルを編集する
-chezmoi edit ~/.zshrc
-
-# 特定のファイルを編集する（ファイル名のみでも可）
-chezmoi edit dot_zshrc
-```
-
-### ファイルの削除
-
-```bash
-# ファイルを chezmoi の管理から外す（実際のファイルは削除されない）
-chezmoi remove ~/.example
-
-# ファイルを chezmoi の管理から外し、実際のファイルも削除する
-chezmoi remove --force ~/.example
-```
-
-### 変更の確認とコミット
-
-```bash
-# 変更内容を確認する
-chezmoi diff
-
-# 変更をリポジトリにコミットする（chezmoi リポジトリ内で実行）
-cd ~/.local/share/chezmoi
-git add .
-git commit -m "Update dotfiles"
-git push
-```
-
-### その他の便利なコマンド
-
-```bash
-# 管理されているファイルのパスを表示する
-chezmoi managed
-
-# 特定のファイルが管理されているか確認する
-chezmoi managed ~/.zshrc
-
-# 設定ファイルを適用する前にプレビューする
-chezmoi apply --dry-run
-
-# 特定のファイルのみを適用する
-chezmoi apply ~/.zshrc
-
-# リモートリポジトリの URL を確認する
-chezmoi source-path
-
-# リモートリポジトリの URL を変更する（SSH 接続を使用）
-chezmoi init git@github.com:YOUR_USERNAME/YOUR_REPO.git
-```
-
-### その他の便利なコマンド（続き）
-
-```bash
-# 設定ファイルを強制的に上書きする（注意して使用）
-chezmoi apply --force
-
-# 設定ファイルをバックアップしてから適用する
-chezmoi apply --backup
-
-# chezmoi の設定を確認する
-chezmoi doctor
-```
-
-## カスタマイズ
-
-### Powerlevel10k の設定
-
-Powerlevel10k の設定は `~/.p10k.zsh` に保存されます。このファイルも chezmoi で管理したい場合
-
-```bash
-chezmoi add ~/.p10k.zsh
-```
-
-### ghostty の設定
-
-ghostty の設定ファイルは `~/.config/ghostty/config` として管理されています。編集する場合は
-
-```bash
-chezmoi edit dot_config/ghostty/config
-```
-
-### wezterm の設定
-
-wezterm の設定は `~/.config/wezterm/` として管理されています。設定ファイルの構成
-
-```text
-dot_config/wezterm/
-├── wezterm.lua    # メインの設定ファイル（UI設定）
-└── keybinds.lua   # キーバインド設定
-```
-
-編集する場合は
-
-```bash
-# UI設定を編集
-chezmoi edit dot_config/wezterm/wezterm.lua
-
-# キーバインド設定を編集
-chezmoi edit dot_config/wezterm/keybinds.lua
-```
-
-**注意** `wezterm.lua` は `keybinds.lua` を自動的に読み込みます。設定を変更した後は、wezterm を再起動するか、`Ctrl+Shift+R` で設定をリロードしてください
-
-### Neovim の設定
-
-Neovim の設定は `~/.config/nvim/` として管理されています。設定ファイルの構成
-
-```text
-dot_config/nvim/
-├── init.lua              # メインの設定ファイル
-├── lazy-lock.json        # Lazy.nvim のロックファイル
-├── lua/
-│   └── plugins/          # プラグイン設定
-│       ├── alpha.lua     # スタートアップ画面
-│       ├── catppuccin.lua # カラースキーム
-│       ├── im-select.lua # IME 自動切り替え
-│       ├── lsp.lua       # LSP 設定
-│       ├── neo-tree.lua  # ファイルエクスプローラー
-│       ├── telescope.lua # ファジーファインダー
-│       └── treesitter.lua # シンタックスハイライト
-└── after/
-    └── lsp/              # LSP サーバー固有の設定
-        ├── cssls.lua
-        ├── html.lua
-        ├── jsonls.lua
-        ├── lua_ls.lua
-        └── ts_ls.lua
-```
-
-編集する場合は
-
-```bash
-# メインの設定ファイルを編集
-chezmoi edit dot_config/nvim/init.lua
-
-# プラグイン設定を編集
-chezmoi edit dot_config/nvim/lua/plugins/lsp.lua
-```
-
-#### Neovim プラグインの追加手順
-
-新しいプラグインを追加する際は、以下の手順に従ってください：
-
-1. **プラグイン設定ファイルを作成**
-
-   chezmoi リポジトリ内に新しいプラグイン設定ファイルを作成します：
-
-   ```bash
-   # 例: im-select.nvim を追加する場合
-   vim ~/.local/share/chezmoi/dot_config/nvim/lua/plugins/im-select.lua
-   ```
-
-2. **chezmoi apply で設定を反映**
-
-   ```bash
-   chezmoi apply
-   ```
-
-3. **NeoVim を起動してプラグインをインストール**
-
-   ```bash
-   nvim
-   ```
-
-   NeoVim 内で以下を実行：
-
-   ```vim
-   :Lazy sync
-   ```
-
-   **重要** インストールが完了するまで待ってから NeoVim を終了してください
-
-4. **lazy-lock.json を chezmoi に反映**
-
-   ```bash
-   chezmoi re-add ~/.config/nvim/lazy-lock.json
-   ```
-
-5. **変更をコミット**
-
-   ```bash
-   cd ~/.local/share/chezmoi
-   git add .
-   git commit -m "add: 新しいプラグイン名"
-   git push origin main
-   ```
-
-#### 注意事項
-
-- **`lazy-lock.json` の扱い** このファイルは NeoVim（Lazy.nvim）が自動更新するファイルです。`chezmoi apply` を実行すると、chezmoi リポジトリのバージョンで上書きされるため、NeoVim でプラグインを更新した後は必ず `chezmoi re-add ~/.config/nvim/lazy-lock.json` で同期してください
-
-- **`chezmoi apply` と `chezmoi re-add` の違い**
-  - `chezmoi apply` chezmoi リポジトリ → 実際のファイル（上書き）
-  - `chezmoi re-add <file>` 実際のファイル → chezmoi リポジトリ（取り込み）
-
-### ghq のカスタム関数
-
-ghq と fzf を組み合わせたカスタム関数は `.zshrc` に定義されています。関数を追加・変更する場合は
-
-```bash
-chezmoi edit dot_zshrc
-```
-
-### lsd のエイリアス
-
-lsd のエイリアスは `.zshrc` に定義されています。エイリアスを追加・変更する場合は
-
-```bash
-chezmoi edit dot_zshrc
-```
-
 ## よくある問題と解決方法
 
-### SSH 接続が失敗する
+### `darwin-rebuild` が見つからない
 
-GitHub への SSH 接続が設定されていない場合は、以下の手順で設定してください
+初回 switch の前は `nix run nix-darwin/master#darwin-rebuild -- <サブコマンド>` を使います。
+switch 後は `/run/current-system/sw/bin/darwin-rebuild` に入り、新しいシェルから `darwin-rebuild` で呼べます。
 
-1. SSH キーを生成（まだ持っていない場合）
+### switch で `Unexpected files in /etc` と出る
 
-```bash
-ssh-keygen -t ed25519 -C "your_email@example.com"
-```
-
-2. SSH キーを GitHub に登録
-
-```bash
-cat ~/.ssh/id_ed25519.pub
-```
-
-上記コマンドで表示された公開鍵を GitHub の Settings > SSH and GPG keys に追加してください。
-
-3. 接続をテスト
-
-```bash
-ssh -T git@github.com
-```
+Nix のインストーラが書いた `/etc/zshrc` などが nix-darwin の既知ハッシュと一致しない場合に出ます。
+表示されたファイルを `sudo mv /etc/zshrc /etc/zshrc.before-nix-darwin` のように退避して再実行します。
 
 ### zinit がインストールされない
 
@@ -524,25 +258,11 @@ mkdir -p "$HOME/.local/share/zinit"
 git clone https://github.com/zdharma-continuum/zinit "$HOME/.local/share/zinit/zinit.git"
 ```
 
-### fzf が動作しない
-
-fzf が正しくインストールされているか確認
+### SSH 接続が失敗する
 
 ```bash
-which fzf
-fzf --version
+ssh-keygen -t ed25519 -C "your_email@example.com"
+cat ~/.ssh/id_ed25519.pub
 ```
 
-fzf のキーバインドが有効になっていない場合は、`.zshrc` を再読み込み
-
-```bash
-source ~/.zshrc
-```
-
-### ghostty が見つからない
-
-ghostty がインストールされていない場合は、Homebrew でインストール
-
-```bash
-brew install ghostty
-```
+表示された公開鍵を GitHub の Settings > SSH and GPG keys に追加し、`ssh -T git@github.com` で接続を確認します。
