@@ -174,7 +174,7 @@ sudo darwin-rebuild switch --flake ~/dotfiles/nix
 
 Homebrew 本体のバージョンは `nix/flake.nix` の `brew-src` input（`github:Homebrew/brew/<バージョン>`）で固定しているため、`brew update` では上がりません。
 上げるには `brew-src` の ref と `nix-homebrew.package` の `name` / `version` を新しいバージョンに変えてコミットし、switch します。
-`brew --version` は版を表示しません（Homebrew の管理リポジトリが Nix 側にあるため）。入っている版は `readlink /opt/homebrew/Library/Homebrew` の store パス名で確認できます。
+`brew --version` は `Homebrew >=4.3.0 (shallow or no git repository)` のように実際とは異なる最小バージョンを表示するため、版の確認には使えません（Homebrew の管理リポジトリが Nix 側にあり git の情報が無いため）。入っている版は `readlink /opt/homebrew/Library/Homebrew` の store パス名（例: `brew-7.0.1-patched`）で確認できます。
 
 ### ロールバック
 
