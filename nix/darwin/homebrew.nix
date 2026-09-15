@@ -34,7 +34,6 @@
 
     casks = [
       "nikitabobko/tap/aerospace"
-      "cmux"
       "dockdoor"
       "font-fira-code-nerd-font"
       "gcloud-cli"
