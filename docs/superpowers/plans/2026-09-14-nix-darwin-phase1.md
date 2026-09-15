@@ -1017,3 +1017,37 @@ git -C /Users/mac83009105/.local/share/chezmoi status --short
 - `git -C /Users/mac83009105/.local/share/chezmoi log --oneline -7` に次の 6 コミットが新しい順に並ぶ（Task 6 Step 6 で activateSettings を外した場合は `fix(nix): ...` が 1 つ増える）:
   `feat(nix): Homebrew の tap と formula と cask を宣言` / `feat(nix): macOS の system.defaults を宣言` / `feat(nix): nix-darwin の flake 骨格を追加` / `fix(zsh): PATH リセット行が既存の PATH を消さないようにする` / `chore(zsh): ローカルの mise 初期化行を chezmoi に同期` / `chore(chezmoi): nix と docs と README.md を配置対象から除外`
 - push と PR 作成はループ外でユーザーが行う
+
+---
+
+## 実行記録（2026-09-15）
+
+全 8 タスクを完了。コミットは計画の 6 に加えて `chore(nix): 使わなくなった cmux を cask 宣言から外す` の 1 つ（ユーザー判断でスコープ追加）。
+計画と実際の差分を残す。次に同種の作業をするときはここを先に読む。
+
+### 計画から外れた点
+
+| 箇所 | 計画 | 実際 |
+|---|---|---|
+| 共通ルール 2 | `[ユーザー実行]` は `! <command>` で実行 | **`!` 経由は対話も sudo のパスワード入力もできない**（Determinate インストーラが `Unable to run interactively` で停止）。sudo を伴う手順はすべてユーザーの通常ターミナルで実行した |
+| Task 3 Step 4 | `/opt/homebrew/bin` の出現数 = 1 | 4。実行者環境の PATH に既に含まれていたため重複した。動作に影響なし |
+| Task 4 Step 3 | `/etc/zshenv` のハッシュ `d07015be…` | `4e8f7cb9…`（nix-darwin の既知リストに「experimental official Nix installer 2.33.3」として登録済み）。`check` は通った |
+| Task 5 Step 7 | 最後の行が `ok` | 正しかった。`check` は activate を `checkActivation=1` で呼び、`ok` を出して終了する（レビュー時に「exit 0」へ緩めたのは不要だった） |
+| Task 5 Step 8 | `nix run nix-darwin/master#darwin-rebuild -- switch` で世代 1 が作られる | **activation は完走したが `/nix/var/nix/profiles/system` が作られなかった**（gcroot も無し）。原因は未確定（当時の出力を保存していなかった）。`sudo nix-env -p /nix/var/nix/profiles/system --set <store path>` を手動実行して世代 1 を作成。以後の `sudo darwin-rebuild switch`（system 内蔵版）は正常に世代を作った |
+| Task 5 Step 9 | `zsh -ic` で `darwin-rebuild` が見える | 実行者環境には `__NIX_DARWIN_SET_ENVIRONMENT_DONE=1` が入っており子 zsh が `/etc/zshenv` の PATH 設定をスキップするため見えない。`env -u __NIX_DARWIN_SET_ENVIRONMENT_DONE -u __ETC_ZSHENV_SOURCED zsh -lic` で新規ログインシェル相当を再現して確認した |
+| Task 6 Step 8 | Task 7 の前にログアウト | この Claude Code セッションも終了するため Task 8 の後に回した |
+| Task 7 Step 2 | brew 36 本 | **38 本**。`whisper.cpp` と `sdl2-compat` を追加。ffmpeg-full の依存だが、formula 側が旧名 `whisper-cpp` / エイリアス `sdl2` で参照しており `brew bundle cleanup` がリネーム／エイリアスを解決できず削除候補にしたため（dry-run で検出、停止条件どおりユーザーに確認して追加） |
+| Task 7 Step 4 | `brew trust` は `[ユーザー実行]` | sudo 不要で実行者が実行できた |
+| Task 7 Step 5→6 | dry-run と実 cleanup は同じ結果 | 実 cleanup は dry-run に無かった `json-c` `qrencode` `llama.cpp` の削除を試みて brew 自身が拒否（依存されているため）。実害なし。`Uninstalled 3 formulae` の表示は誤りで 3 つとも残っている |
+| Task 7 Step 6 | `Untapping idoavrah/homebrew` `Untapping manaflow-ai/cmux` | `manaflow-ai/cmux` の untap で `Refusing to load cask manaflow-ai/cmux/cmux from untrusted tap` が出て untap フェーズが止まり、2 つとも残った。`idoavrah/homebrew` は手動 `brew untap` で成功。`manaflow-ai/cmux` は `brew trust` → `brew untap` でも「インストール済み cask がある」と拒否 |
+| Task 7 Step 6 | `upgrade = false` なので更新なし | **ffmpeg-full が 8.1 → 9.0.1_1 に更新された**。`sdl2` → `sdl2-compat` のリネーム keg 移行に伴い brew が依存元を再インストールしたため。`--no-upgrade` は Brewfile 記載物の upgrade を抑止するだけで、この動作は抑止しない |
+| Task 7 Step 7 | casks 7 | ユーザーが「cmux は使わない」と判断 → 宣言から外し（`81616d4`）、Task 8 Step 4 の switch で cleanup が削除。casks は **6** |
+| Task 8 Step 1 | `darwin-rebuild --list-generations` | root 権限が必要（`system.lock` の作成）。`ls -la /nix/var/nix/profiles/` で代替 |
+| Task 8 | 世代 1〜3、往復で 4 | 実際も 1〜4（1 = 手動作成の骨格、2 = defaults、3 = homebrew、4 = 再 switch で cmux 削除） |
+
+### 二度と踏まないための注意
+
+- **`brew untap --force <tap>` は、その tap に帰属していると記録された cask を本体ごとアンインストールする。** cmux がこれで一度消え、`brew install --cask cmux` で復旧した（その後ユーザー判断で削除）。「--force は untap だけ」ではない
+- `brew bundle check` は `--no-upgrade` を付けないと outdated な formula を「未充足」と報告する。nix-darwin と同じ条件で見るなら必ず付ける
+- 初回 switch の直後に `ls -la /nix/var/nix/profiles/system` を確認する。無ければ `sudo nix-env -p /nix/var/nix/profiles/system --set $(readlink /run/current-system)` で作る
+- dry-run に出た `libtiff, webp` の循環依存 warning は ffmpeg 更新後の keg tab の古さによるもの。brew の案内どおり再インストールすれば消える（Phase 1 対象外）

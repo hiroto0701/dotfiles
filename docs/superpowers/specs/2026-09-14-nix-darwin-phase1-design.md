@@ -273,6 +273,9 @@ Phase 1 では nix-darwin を導入し、この 2 層を宣言的に管理する
       { name = "imagemagick-full"; link = true; }
       "jq" "lazygit" "lazysql" "lsd" "neovim" "nkf" "nodebrew" "poppler" "redis"
       "resvg" "ripgrep" "sevenzip" "tmux" "tree-sitter" "tree-sitter-cli" "yazi" "zoxide"
+      # ffmpeg-full の依存。formula 側は旧名 whisper-cpp / エイリアス sdl2 で参照しており、
+      # brew bundle cleanup がリネーム/エイリアスを解決できず削除候補にするため明示する
+      "whisper.cpp" "sdl2-compat"
       "daipeihust/tap/im-select"
       { name = "felixkratz/formulae/borders"; start_service = true; }
       "jesseduffield/lazydocker/lazydocker"
@@ -281,7 +284,6 @@ Phase 1 では nix-darwin を導入し、この 2 層を宣言的に管理する
 
     casks = [
       "nikitabobko/tap/aerospace"
-      "cmux"
       "dockdoor"
       "font-fira-code-nerd-font"
       "gcloud-cli"
@@ -294,6 +296,9 @@ Phase 1 では nix-darwin を導入し、この 2 層を宣言的に管理する
 
 - 現在の tap のうち `manaflow-ai/cmux`（cmux は公式 cask に移った）と `idoavrah/homebrew`（uv 用）は
   宣言しないので cleanup で消える。
+- 実装時の変更（2026-09-15）: brews に `whisper.cpp` `sdl2-compat` を追加（ffmpeg-full の依存。
+  brew bundle cleanup のリネーム／エイリアス解決の穴を吸収するため）。cask `cmux` はユーザー判断で
+  宣言から外し、switch の cleanup で削除した。最終形は brew 38 / cask 6 / tap 5。
 - `trusted = true` を tap 側に付ける。付けないと brew が formula の読み込みを拒否し、
   `brew leaves` / `brew bundle dump` から黙って落ちる（§8.1）。
 
@@ -442,6 +447,19 @@ borders（ウィンドウ枠、`brew services` で常駐中）が消えていた
   `compinit` を書く。既存 `/etc/zshrc` が既知ハッシュ（Determinate インストーラ生成を含む）なら置換、
   未知なら activation を停止して退避手順を表示する
 - `TISRomanSwitchState` は `CustomUserPreferences` の公式 example として載っている
+
+### 8.2.1 実装時に判明した挙動（2026-09-15、プランの「実行記録」に詳細）
+
+- `sudo nix run nix-darwin/master#darwin-rebuild -- switch` による初回 switch は activation を完走したが
+  `/nix/var/nix/profiles/system` を作らなかった（原因未確定）。手動 `nix-env -p ... --set` で世代 1 を作成。
+  以後の `sudo darwin-rebuild switch` は正常に世代を作る
+- `brew bundle cleanup` は formula のリネーム（`whisper-cpp` → `whisper.cpp`）とエイリアス（`sdl2` →
+  `sdl2-compat`）を解決できず、依存を「宣言外」として削除候補にする。依存を明示宣言して回避
+- `brew untap --force <tap>` は、その tap に帰属すると記録された cask を本体ごとアンインストールする
+- リネームされた keg の移行時、brew は依存元を再インストールする。`onActivation.upgrade = false`
+  （`--no-upgrade`）はこれを抑止しない（ffmpeg-full が 8.1 → 9.0.1_1 に上がった）
+- `darwin-rebuild --list-generations` は root 権限が必要。`ls -la /nix/var/nix/profiles/` で代替できる
+- `darwin-rebuild check` は成功時に `ok` を出力する
 
 ### 8.3 現在の環境
 
