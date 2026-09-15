@@ -92,3 +92,6 @@ key = "prefix+alt+f"
 type = "pane"
 command = "yazi"
 description = "yazi ファイラを起動"
+
+[experimental]
+kitty_graphics = true
