@@ -107,21 +107,20 @@ nvimrepo() {
   fi
 }
 
-# nvim設定の変更をchezmoiソースに取り込んでコミット
+# nvim設定の変更をコミット（~/.config/nvim は ~/dotfiles/.config/nvim への symlink）
 nvim-sync() {
-  local src=$(chezmoi source-path)
-  chezmoi add "$HOME/.config/nvim" || return 1
-  local changed=$(git -C "$src" status --porcelain -- dot_config/nvim)
+  local repo="$HOME/dotfiles"
+  local changed=$(git -C "$repo" status --porcelain -- .config/nvim)
   if [ -z "$changed" ]; then
     echo "変更なし"
     return 0
   fi
-  git -C "$src" add -- dot_config/nvim
-  local msg="chore(nvim): 設定変更を chezmoi に同期"
-  if [ "$(echo "$changed" | awk '{print $2}' | sort -u)" = "dot_config/nvim/lazy-lock.json" ]; then
+  git -C "$repo" add -- .config/nvim
+  local msg="chore(nvim): 設定変更をコミット"
+  if [ "$(echo "$changed" | awk '{print $2}' | sort -u)" = ".config/nvim/lazy-lock.json" ]; then
     msg="chore(nvim): プラグインロックを更新"
   fi
-  git -C "$src" commit -q -m "$msg" -- dot_config/nvim && git -C "$src" log --oneline -1
+  git -C "$repo" commit -q -m "$msg" -- .config/nvim && git -C "$repo" log --oneline -1
 }
 
 # cdev: 開発レイアウトで起動
