@@ -99,7 +99,8 @@ Phase 2 と 3 を分ける理由: Phase 2 で壊れるのは「設定ファイ�
 │   └── home/
 │       ├── default.nix
 │       └── dotfiles.nix                   # symlink の対応表
-├── docs/superpowers/{specs,plans}/
+├── docs/superpowers/{specs,plans}/        # git 管理外（.gitignore）。public リポジトリに個人環境の詳細を出さない
+├── .gitignore                             # docs/superpowers/
 └── README.md                              # 新 PC 手順に書き直す
 ```
 
