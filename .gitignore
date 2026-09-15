@@ -1,2 +1,8 @@
 # superpowers の設計書・実装プラン。public リポジトリに個人環境の詳細を出さないため管理外にする
 docs/superpowers/
+
+# direnv の個人設定（git author のメールアドレスを含む）。別マシンにはグローバル gitignore が無いためここでも除外する
+.envrc
+
+# Claude Code のプロジェクトローカル設定
+.claude/settings.local.json
