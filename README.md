@@ -100,7 +100,7 @@ hosts = {
 };
 ```
 
-ホスト名は `scutil --get LocalHostName` で確認できます。flake は git 追跡ファイルしか見ないので `git add nix/flake.nix` を忘れないでください。
+ホスト名は `scutil --get LocalHostName` で確認できます。flake は git 追跡ファイルしか見ないため、新しいファイルを足したときは `git add` が必要です（`nix/flake.nix` の編集だけなら不要）。
 
 ### 4. switch
 
