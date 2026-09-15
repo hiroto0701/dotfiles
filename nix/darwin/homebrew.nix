@@ -1,7 +1,7 @@
 { ... }:
 {
   homebrew = {
-    enable = true;                        # Homebrew 本体は事前に入っている前提。nix-darwin は入れない
+    enable = true;                        # Homebrew 本体は nix-homebrew が入れる (flake.nix)。ここは formula / cask の宣言
     onActivation = {
       cleanup = "uninstall";              # 宣言に無い formula / cask / tap を削除。宣言物の依存は残る
       autoUpdate = false;
@@ -17,7 +17,7 @@
     ];
 
     brews = [
-      "bat" "chezmoi" "coreutils" "direnv" "expat" "fd"
+      "bat" "coreutils" "direnv" "expat" "fd"
       { name = "ffmpeg-full"; link = true; }
       "fzf" "gh" "ghq" "git" "go" "herdr" "hunk"
       { name = "imagemagick-full"; link = true; }
