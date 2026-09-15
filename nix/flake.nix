@@ -42,7 +42,7 @@
                 enable = true;
                 user = h.user;
                 # follows だけだと nix-homebrew は自分の flake.lock から "6.0.22" のラベルを付けるため、
-                # name / version も 7.0.1 で揃える。`brew --version` には出ないが、
+                # name / version も 7.0.1 で揃える。`brew --version` は `>=4.3.0` としか出ないため、
                 # store パス名 `brew-7.0.1-patched` で確認できる
                 package = brew-src // { name = "brew-7.0.1"; version = "7.0.1"; };
                 autoMigrate = true;      # 公式スクリプトで入れた既存 /opt/homebrew を引き継ぐ
