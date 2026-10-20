@@ -1,5 +1,6 @@
 ---
 name: drawing-c4-architecture
+disable-model-invocation: true
 description: Use when asked to draw, document, or explain a software architecture as a C4 model (System Context / Container / Component) in HTML — for an existing codebase (as-is) or a design doc (to-be). Triggers include "C4", "アーキテクチャ図", "構成図を HTML で", "architecture diagram", "container diagram", "システム全体像を可視化".
 ---
 
