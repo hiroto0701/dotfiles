@@ -26,9 +26,10 @@ in
     # Orca は ~/.orca/keybindings.json 固定（XDG 非対応）。source だけ .config に寄せる。
     # ~/.orca/agent-hooks/ はランタイムなので file 単位
     ".orca/keybindings.json".source = link ".config/orca/keybindings.json";
-    # ~/.claude/ 自体はランタイム。スキル 2 つだけ dir 単位で置く
+    # ~/.claude/ 自体はランタイム。自作スキルだけ dir 単位で置く
     ".claude/skills/grill-with-docs".source = link ".claude/skills/grill-with-docs";
     ".claude/skills/llm-wiki".source = link ".claude/skills/llm-wiki";
+    ".claude/skills/drawing-c4-architecture".source = link ".claude/skills/drawing-c4-architecture";
     # 実行ビットは symlink 先（リポジトリ側）の mode で決まる。git 上で 100755 にしておく
     ".local/bin/difit-cmux".source = link ".local/bin/difit-cmux";
     # lazygit は state.yml を隣に書く

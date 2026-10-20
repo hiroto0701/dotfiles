@@ -44,7 +44,7 @@ dotfiles の実体はこのリポジトリ（`~/dotfiles`）に 1 つだけあ�
 │   ├── cmux/settings.json        # ファイル単位（隣にアプリがランタイムファイルを書くため）
 │   ├── herdr/config.toml
 │   └── orca/keybindings.json     # 配置先は ~/.orca/keybindings.json（Orca は XDG 非対応）
-├── .claude/skills/               # Claude Code のスキル 2 つ
+├── .claude/skills/               # Claude Code の自作スキル
 ├── .local/bin/difit-cmux
 ├── Library/Application Support/lazygit/config.yml
 ├── .zshrc, .zprofile, .p10k.zsh

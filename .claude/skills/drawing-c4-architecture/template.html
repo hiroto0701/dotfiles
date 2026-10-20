@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ja" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>システム名 アーキテクチャ（C4）</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f7f7f5; --surface: #ffffff; --fg: #1f2328; --muted: #59636e; --rule: #d0d7de;
+  --person: #08427b; --system: #1168bd; --container: #438dd5; --component: #85bbf0;
+  --external: #8a8a8a; --on-dark: #ffffff; --on-light: #0b1f33;
+  --line: #6e7781; --boundary: #8c959f;
+  --new: #1a7f37; --changed: #bf8700; --removed: #8c959f;
+}
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 15px/1.7 -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+main { max-width: 1200px; margin: 0 auto; padding-block: 32px 64px; padding-inline: 16px; }
+h1 { font-size: 1.6rem; margin: 0 0 8px; }
+h2 { font-size: 1.25rem; margin: 48px 0 8px; padding-top: 8px; border-top: 1px solid var(--rule); }
+h3 { font-size: 1.05rem; margin: 28px 0 8px; }
+p, li { max-width: 72ch; }
+.meta { display: grid; grid-template-columns: max-content 1fr; gap: 2px 16px; margin: 16px 0;
+  padding: 12px 16px; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; font-size: 0.9rem; }
+.meta dt { color: var(--muted); }
+.meta dd { margin: 0; overflow-wrap: anywhere; }
+code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.88em; }
+figure { margin: 16px 0; }
+.diagram { overflow-x: auto; background: var(--surface); border: 1px solid var(--rule); border-radius: 8px; padding: 12px; }
+.diagram svg { display: block; max-width: none; height: auto; }
+figcaption { color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
+.table-wrap { overflow-x: auto; }
+table { border-collapse: collapse; font-size: 0.9rem; min-width: 100%; }
+th, td { border: 1px solid var(--rule); padding: 6px 10px; text-align: left; vertical-align: top; }
+th { background: var(--surface); }
+.unverified { color: var(--changed); font-weight: 600; }
+
+/* ---- C4 SVG ---- */
+svg.c4 text { font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif; }
+svg.c4 .el .shape { stroke: none; }
+svg.c4 .el.person .shape, svg.c4 .el.person .head { fill: var(--person); }
+svg.c4 .el.system .shape { fill: var(--system); }
+svg.c4 .el.container .shape { fill: var(--container); }
+svg.c4 .el.component .shape { fill: var(--component); }
+svg.c4 .el.external .shape, svg.c4 .el.external .head { fill: var(--external); }
+svg.c4 .el text { fill: var(--on-dark); text-anchor: middle; }
+svg.c4 .el.component text { fill: var(--on-light); }
+svg.c4 .el .name { font-size: 15px; font-weight: 700; }
+svg.c4 .el .kind { font-size: 11px; opacity: 0.85; }
+svg.c4 .el .desc { font-size: 12px; }
+svg.c4 .el .tag { font-size: 10px; font-weight: 700; text-anchor: end; }
+svg.c4 .el.new .shape { stroke: var(--new); stroke-width: 4; }
+svg.c4 .el.changed .shape { stroke: var(--changed); stroke-width: 4; }
+svg.c4 .el.removed { opacity: 0.55; }
+svg.c4 .el.removed .shape { stroke: var(--removed); stroke-width: 2; stroke-dasharray: 6 4; }
+svg.c4 .boundary rect { fill: none; stroke: var(--boundary); stroke-width: 1.5; stroke-dasharray: 8 5; }
+svg.c4 .boundary text { fill: var(--muted); font-size: 13px; font-weight: 700; }
+svg.c4 .rel .line { fill: none; stroke: var(--line); stroke-width: 1.5; marker-end: url(#c4-arrow); }
+svg.c4 .rel.async .line { stroke-dasharray: 6 4; }
+svg.c4 .rel.new .line { stroke: var(--new); stroke-width: 2.5; }
+svg.c4 .rel.removed { opacity: 0.55; }
+svg.c4 .rel.removed .line { stroke-dasharray: 3 4; }
+svg.c4 .rel text { fill: var(--fg); font-size: 12px; text-anchor: middle;
+  paint-order: stroke; stroke: var(--surface); stroke-width: 5px; stroke-linejoin: round; }
+svg.c4 .rel .tech { fill: var(--muted); font-size: 11px; }
+svg.c4-defs { position: absolute; width: 0; height: 0; }
+#c4-arrow path { fill: var(--line); }
+</style>
+</head>
+<body>
+<!-- 矢印の marker 定義。全図がここを参照するので消さない -->
+<svg class="c4-defs" aria-hidden="true"><defs>
+  <marker id="c4-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z"/></marker>
+</defs></svg>
+
+<main data-c4-mode="as-is" data-c4-commit="0000000">
+<h1>システム名 アーキテクチャ（C4）</h1>
+<dl class="meta">
+  <dt>種別</dt><dd>as-is（現在のコード）</dd>
+  <dt>基準コミット</dt><dd><code>0000000</code>（ブランチ名）</dd>
+  <!-- to-be では次の行を足す: <dt>比較の基準</dt><dd>状態（新設・変更・廃止）を何と比べたか</dd> -->
+  <dt>作成日</dt><dd>YYYY-MM-DD</dd>
+  <dt>参照した資料</dt><dd><code>README.md</code>、<code>docker/compose.yml</code> など</dd>
+  <dt>描いていないもの</dt><dd>L4（Code）、配置図。理由を一言</dd>
+</dl>
+
+<h2>凡例</h2>
+<!-- 凡例は図ではないので svg.c4 にしない（check.mjs の対象外） -->
+<div class="diagram">
+<svg class="c4 legend" viewBox="0 0 900 70" width="900" height="70" role="img" aria-label="凡例">
+  <g class="el person"><rect class="shape" x="0" y="10" width="120" height="44" rx="10"/><text class="name" x="60" y="38">人物</text></g>
+  <g class="el system"><rect class="shape" x="135" y="10" width="140" height="44" rx="6"/><text class="name" x="205" y="38">対象システム</text></g>
+  <g class="el container"><rect class="shape" x="290" y="10" width="130" height="44" rx="6"/><text class="name" x="355" y="38">Container</text></g>
+  <g class="el component"><rect class="shape" x="435" y="10" width="140" height="44" rx="6"/><text class="name" x="505" y="38">Component</text></g>
+  <g class="el external"><rect class="shape" x="590" y="10" width="140" height="44" rx="6"/><text class="name" x="660" y="38">外部システム</text></g>
+  <g class="rel"><path class="line" d="M745 32 H835"/><text x="790" y="24">同期</text></g>
+  <g class="rel async"><path class="line" d="M745 58 H835"/><text x="790" y="68" class="tech">非同期</text></g>
+</svg>
+</div>
+<p>to-be の図では、枠線の色で状態を示す。緑＝新設、黄＝変更、破線＋半透明＝廃止。矢印も同じ（緑の太線＝新設、点線＋半透明＝廃止）。</p>
+
+<h2>L1 System Context</h2>
+<p>この図で分かること（1文で、答えの形で書く）。</p>
+<figure>
+<div class="diagram">
+<!-- 記法の見本。要素は g.el、関係は g.rel、境界は g.boundary。.shape は要素の外形で、文字は必ずその内側に収める -->
+<svg class="c4" viewBox="0 0 760 420" width="760" height="420" role="img" aria-label="L1 System Context">
+  <g class="el person">
+    <circle class="head" cx="380" cy="26" r="16"/>
+    <rect class="shape" x="290" y="38" width="180" height="70" rx="12"/>
+    <text class="name" x="380" y="66">閲覧者</text>
+    <text class="kind" x="380" y="84">[人物]</text>
+    <text class="desc" x="380" y="100">公開サイトを見る</text>
+  </g>
+  <g class="el system new">
+    <rect class="shape" x="270" y="170" width="220" height="90" rx="8"/>
+    <text class="tag" x="482" y="186">新設</text>
+    <text class="name" x="380" y="204">対象システム</text>
+    <text class="kind" x="380" y="222">[ソフトウェアシステム]</text>
+    <text class="desc" x="380" y="242">記事を編集して公開する</text>
+  </g>
+  <g class="el external">
+    <rect class="shape" x="270" y="320" width="220" height="80" rx="8"/>
+    <text class="name" x="380" y="350">メール配信サービス</text>
+    <text class="kind" x="380" y="368">[外部システム]</text>
+    <text class="desc" x="380" y="386">通知メールを送る</text>
+  </g>
+  <g class="rel">
+    <path class="line" d="M380 108 V168"/>
+    <text x="440" y="134">ページを見る</text>
+    <text class="tech" x="440" y="150">[HTTPS]</text>
+  </g>
+  <g class="rel async">
+    <path class="line" d="M380 260 V318"/>
+    <text x="450" y="286">通知を依頼する</text>
+    <text class="tech" x="450" y="302">[SMTP]</text>
+  </g>
+</svg>
+</div>
+<figcaption>図の番号と一言の説明。</figcaption>
+</figure>
+<!-- to-be では「種別」の後に「状態」列（新設 / 変更 / 廃止 / 既存）を足す -->
+<div class="table-wrap"><table>
+  <thead><tr><th>要素</th><th>種別</th><th>技術</th><th>責務</th><th>根拠</th></tr></thead>
+  <tbody><tr><td>対象システム</td><td>ソフトウェアシステム</td><td>-</td><td>記事を編集して公開する</td><td><code>path/to/file</code></td></tr></tbody>
+</table></div>
+
+<h2>L2 Container</h2>
+<!-- g.el が15個を超えるなら、ここに Container 一覧表を置き、図は観点ごとに L2-a, L2-b ... と分ける -->
+<!-- 境界の記法（L2 と L3 で必ず付ける）:
+  <g class="boundary">
+    <rect x="20" y="150" width="900" height="500" rx="10"/>
+    <text x="34" y="172">対象の名前 [ソフトウェアシステム]</text>
+  </g>
+  ラベルは境界の内側の左上に置く。人物と外部システムは境界の外に置く。
+  L3 では境界がその Container を表す。Container 自体が出す矢印（例: 標準 webhook）は境界の辺から引く -->
+
+<h2>L3 Component: コンテナ名</h2>
+
+<h2>前提と未確認事項</h2>
+<ul>
+  <li><span class="unverified">推定</span> コードで確かめられなかった関係と、その理由。</li>
+</ul>
+</main>
+</body>
+</html>
