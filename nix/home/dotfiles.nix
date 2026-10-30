@@ -16,6 +16,9 @@ in
     # file 単位: cmux は cmux.json、herdr はログ・ソケット・session.json を隣に書く
     "cmux/settings.json".source = link ".config/cmux/settings.json";
     "herdr/config.toml".source = link ".config/herdr/config.toml";
+    # herdr-app は view.json・ソケット・同梱 mod を同じ dir に書くので、自分で書いたものだけ置く
+    "herdr-app/keys.json".source = link ".config/herdr-app/keys.json";
+    "herdr-app/mods/tmux-prefix".source = link ".config/herdr-app/mods/tmux-prefix";
   };
 
   # ~/ 配下
