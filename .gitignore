@@ -6,3 +6,7 @@ docs/superpowers/
 
 # Claude Code のプロジェクトローカル設定
 .claude/settings.local.json
+
+# herdr-app が mod ごとに書く補完用の型定義とエディタ設定
+.config/herdr-app/mods/*/gpui-kit.d.ts
+.config/herdr-app/mods/*/jsconfig.json
