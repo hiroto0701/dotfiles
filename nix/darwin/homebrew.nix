@@ -33,7 +33,7 @@
     ];
 
     brews = [
-      "bat" "coreutils" "direnv" "expat" "fd"
+      "atac" "bat" "coreutils" "direnv" "expat" "fd"
       { name = "ffmpeg-full"; link = true; }
       "fzf" "gh" "ghq" "git" "go" "herdr" "hunk"
       { name = "imagemagick-full"; link = true; }
