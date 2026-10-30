@@ -30,6 +30,7 @@
       { name = "jesseduffield/lazydocker"; trusted = true; }
       { name = "nikitabobko/tap"; trusted = true; }
       { name = "oven-sh/bun"; trusted = true; }
+      { name = "penso/tap"; trusted = true; }
     ];
 
     brews = [
@@ -50,6 +51,7 @@
 
     casks = [
       "nikitabobko/tap/aerospace"
+      "penso/tap/herdr-gpui"
       "dockdoor"
       "font-fira-code-nerd-font"
       "gcloud-cli"
