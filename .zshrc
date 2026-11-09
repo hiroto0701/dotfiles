@@ -35,6 +35,8 @@ fi
 if [[ -f '/opt/homebrew/share/google-cloud-sdk/completion.zsh.inc' ]]; then
   source '/opt/homebrew/share/google-cloud-sdk/completion.zsh.inc'
 fi
+# Backlog MCP の API キー（値はキーチェーン。各リポジトリの .mcp.json が ${BACKLOG_API_KEY} で参照する）
+export BACKLOG_API_KEY="$(security find-generic-password -a "$USER" -s backlog-api-key -w 2>/dev/null)"
 
 VOLTA_HOME=$HOME/.volta
 export PATH=$VOLTA_HOME/bin:$PATH
