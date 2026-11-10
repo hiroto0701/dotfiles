@@ -30,6 +30,7 @@ in
     ".claude/skills/grill-with-docs".source = link ".claude/skills/grill-with-docs";
     ".claude/skills/llm-wiki".source = link ".claude/skills/llm-wiki";
     ".claude/skills/drawing-c4-architecture".source = link ".claude/skills/drawing-c4-architecture";
+    ".claude/skills/reviewing-mock-exams".source = link ".claude/skills/reviewing-mock-exams";
     # 実行ビットは symlink 先（リポジトリ側）の mode で決まる。git 上で 100755 にしておく
     ".local/bin/difit-cmux".source = link ".local/bin/difit-cmux";
     # lazygit は state.yml を隣に書く

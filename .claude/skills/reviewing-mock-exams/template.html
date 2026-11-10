@@ -1,0 +1,577 @@
+<title>{{略称}} 模試復習帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+/* Layout: 左に固定の目次と復習ツール、右に約 780px の本文。分野ごとの章は公式ガイドの分野色（d1〜d6）で識別し、問題はカード、図は枠付きの figure。ライト固定。 */
+:root {
+  --paper: #F3F5F8;
+  --sheet: #FFFFFF;
+  --paper-2: #E8ECF2;
+  --ink: #16203A;
+  --ink-2: #48526A;
+  --ink-3: #7C859A;
+  --rule: #D8DEE8;
+  --line-strong: #9AA3B5;
+  --accent: #1E3F94;
+  --hl: #FFE27A;
+  --bad: #C2333B; --bad-tint: #FBEDED;
+  --good: #137A47; --good-tint: #E7F4EC;
+  --d1: #2a78d6; --d1-ink: #1C5BA9; --d1-tint: #EAF2FC;
+  --d2: #eb6834; --d2-ink: #B04415; --d2-tint: #FDEFE8;
+  --d3: #1baf7a; --d3-ink: #0D7550; --d3-tint: #E5F6EE;
+  --d4: #eda100; --d4-ink: #855A00; --d4-tint: #FDF3DC;
+  --d5: #e87ba4; --d5-ink: #AE3866; --d5-tint: #FCEDF3;
+  --d6: #6250d6; --d6-ink: #4B3BB8; --d6-tint: #EEECFB;
+  --f-display: "Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  --f-body: "BIZ UDPGothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 6px;
+}
+html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.85;
+  -webkit-text-size-adjust: 100%;
+  font-feature-settings: "palt" 0;
+}
+a { color: var(--accent); text-underline-offset: 3px; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+code, .mono { font-family: var(--f-mono); font-size: .88em; }
+code { background: var(--paper-2); padding: 1px 5px; border-radius: 3px; word-break: break-all; }
+b, strong { font-weight: 700; }
+.kw { background: linear-gradient(transparent 58%, var(--hl) 58%); padding: 0 1px; }
+
+/* hero */
+.hero { background: var(--sheet); border-bottom: 1px solid var(--rule); }
+.hero-in {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 32px;
+  display: grid; gap: 14px;
+}
+.eyebrow { margin: 0; font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; color: var(--ink-2); text-transform: uppercase; }
+.hero h1 { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: clamp(30px, 5.4vw, 50px); line-height: 1.2; letter-spacing: .02em; text-wrap: balance; }
+.hero .lead { margin: 0; max-width: 46em; color: var(--ink-2); }
+.facts { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: 6px 0 0; padding: 0; }
+.facts div { display: grid; gap: 0; }
+.facts dt { font-size: 12px; color: var(--ink-3); letter-spacing: .04em; }
+.facts dd { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.facts dd small { font-family: var(--f-body); font-weight: 400; font-size: 13px; color: var(--ink-2); margin-left: 4px; }
+.facts .warn dd { color: var(--bad); }
+
+/* layout */
+.wrap {
+  max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 96px;
+  display: grid; grid-template-columns: 228px minmax(0, 1fr); gap: 48px;
+}
+main { min-width: 0; max-width: 800px; display: grid; gap: 64px; }
+aside.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); align-self: start; max-height: calc(100vh - 32px); overflow: auto; display: grid; gap: 18px; padding-bottom: 12px; }
+@media (max-width: 980px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  aside.toc { position: static; max-height: none; }
+}
+.tools { display: grid; gap: 10px; padding: 14px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); }
+.tools p { margin: 0; font-size: 12.5px; color: var(--ink-2); line-height: 1.6; }
+.btn { font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; border-radius: 4px; padding: 7px 12px; border: 1px solid var(--ink); background: var(--sheet); color: var(--ink); text-align: center; }
+.btn:hover { background: var(--paper-2); }
+.btn[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.progress { display: flex; align-items: baseline; gap: 6px; font-size: 13px; color: var(--ink-2); }
+.progress b { font-family: var(--f-display); font-size: 18px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.meter { height: 6px; background: var(--paper-2); border-radius: 3px; overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .3s; }
+@media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+nav.toc-nav ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc-nav > ol > li > a { display: flex; align-items: center; gap: 8px; padding: 4px 6px; border-radius: 4px; text-decoration: none; color: var(--ink); font-size: 13.5px; font-weight: 700; }
+nav.toc-nav > ol > li > a:hover { background: var(--paper-2); }
+nav.toc-nav ol ol { padding-left: 22px; margin: 2px 0 6px; }
+nav.toc-nav ol ol a { display: block; padding: 1px 6px; font-size: 12.5px; color: var(--ink-2); text-decoration: none; border-radius: 3px; }
+nav.toc-nav ol ol a:hover { background: var(--paper-2); color: var(--ink); }
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--ink-3); }
+.dot.d1 { background: var(--d1); } .dot.d2 { background: var(--d2); } .dot.d3 { background: var(--d3); } .dot.d4 { background: var(--d4); } .dot.d5 { background: var(--d5); } .dot.d6 { background: var(--d6); }
+.dot.ring { background: transparent; box-shadow: inset 0 0 0 2px var(--ink-3); }
+@media (max-width: 980px) {
+  nav.toc-nav ol ol { display: none; }
+  nav.toc-nav > ol { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}
+
+/* chapters */
+.chap { display: grid; gap: 22px; }
+.chap-head { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 2px solid var(--ink); }
+.chap-head .tag { font-family: var(--f-mono); font-size: 12px; letter-spacing: .06em; color: var(--ink-2); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.chap-head h2 { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: clamp(24px, 3.6vw, 32px); line-height: 1.3; text-wrap: balance; }
+.chap-head p { margin: 0; color: var(--ink-2); }
+.chap.d1 .chap-head { border-color: var(--d1); }
+.chap.d2 .chap-head { border-color: var(--d2); }
+.chap.d3 .chap-head { border-color: var(--d3); }
+.chap.d4 .chap-head { border-color: var(--d4); }
+.chap.d5 .chap-head { border-color: var(--d5); }
+.chap.d6 .chap-head { border-color: var(--d6); }
+.sec { display: grid; gap: 14px; }
+.sec h3 { margin: 10px 0 0; font-family: var(--f-display); font-weight: 700; font-size: 20px; line-height: 1.45; text-wrap: balance; }
+.sec h4 { margin: 6px 0 0; font-family: var(--f-display); font-weight: 700; font-size: 16px; }
+.sec p { margin: 0; }
+.sec ul, .sec ol.plain { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
+.subhead { font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .06em; color: var(--ink-2); margin: 0; }
+.cards { display: grid; gap: 18px; }
+
+/* stat line per domain */
+.dstat { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; color: var(--ink-2); }
+.dstat b { font-family: var(--f-display); font-size: 17px; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+/* chips */
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 1px 9px 1px 7px; border-radius: 99px; background: var(--paper-2); color: var(--ink); white-space: nowrap; line-height: 1.7; }
+.chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
+.chip.d1 { background: var(--d1-tint); color: var(--d1-ink); } .chip.d1::before { background: var(--d1); }
+.chip.d2 { background: var(--d2-tint); color: var(--d2-ink); } .chip.d2::before { background: var(--d2); }
+.chip.d3 { background: var(--d3-tint); color: var(--d3-ink); } .chip.d3::before { background: var(--d3); }
+.chip.d4 { background: var(--d4-tint); color: var(--d4-ink); } .chip.d4::before { background: var(--d4); }
+.chip.d5 { background: var(--d5-tint); color: var(--d5-ink); } .chip.d5::before { background: var(--d5); }
+.chip.d6 { background: var(--d6-tint); color: var(--d6-ink); } .chip.d6::before { background: var(--d6); }
+.chip.multi { background: var(--sheet); box-shadow: inset 0 0 0 1px var(--ink-2); color: var(--ink); }
+.chip.multi::before { display: none; }
+.chip.pat { background: var(--sheet); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-2); font-weight: 400; }
+.chip.r-ok { background: var(--good-tint); color: var(--good); } .chip.r-ok::before { background: var(--good); }
+.chip.r-ng { background: var(--bad-tint); color: var(--bad); } .chip.r-ng::before { background: var(--bad); }
+.chip.pat::before { display: none; }
+
+/* question card */
+.q { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 18px 20px 16px; display: grid; gap: 12px; scroll-margin-top: 16px; }
+.q-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.q-no { font-family: var(--f-mono); font-weight: 600; font-size: 13px; letter-spacing: .02em; }
+.q-head .sp { flex: 1 1 auto; }
+.done { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--ink-2); cursor: pointer; user-select: none; }
+.done input { width: 16px; height: 16px; accent-color: var(--ink); margin: 0; }
+.q-text { margin: 0; }
+.opts { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.opts li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 4px 8px; align-items: baseline; padding: 7px 10px; border-radius: 4px; background: var(--paper); font-size: 14px; line-height: 1.7; }
+.opts .k { font-family: var(--f-mono); font-weight: 600; }
+.opts .bdg { display: inline-flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.badge { font-size: 11.5px; font-weight: 700; padding: 0 8px; border-radius: 99px; white-space: nowrap; line-height: 1.8; }
+.badge.ok { background: var(--ink); color: #fff; }
+.badge.mine { color: var(--bad); box-shadow: inset 0 0 0 1px var(--bad); background: var(--sheet); }
+.opts li.ok { background: var(--paper-2); box-shadow: inset 0 0 0 1.5px var(--ink); font-weight: 700; }
+.opts li.mine { background: var(--bad-tint); box-shadow: inset 0 0 0 1.5px var(--bad); }
+.opts li.ok.mine { background: var(--paper-2); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.ans { display: grid; gap: 10px; border-top: 1px dashed var(--rule); padding-top: 12px; }
+.ans p { margin: 0; }
+.ans .row { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 10px; }
+.ans .lab { font-family: var(--f-display); font-weight: 700; font-size: 13px; color: var(--ink-2); padding-top: 2px; }
+.ans .row.trap .lab { color: var(--bad); }
+.ans .row.key .lab { color: var(--ink); }
+.ans .row.key > span:last-child { font-weight: 700; }
+.ans .note { font-size: 13px; color: var(--ink-2); background: var(--paper); border-radius: 4px; padding: 8px 10px; }
+.ans .note b { color: var(--ink); }
+.ans .ref { font-size: 13px; }
+.reveal { display: none; justify-self: start; }
+body.quiz .q:not(.open) .badge { display: none; }
+body.quiz .q:not(.open) .opts li.ok,
+body.quiz .q:not(.open) .opts li.mine { background: var(--paper); box-shadow: none; font-weight: 400; }
+body.quiz .q:not(.open) .ans { display: none; }
+body.quiz .reveal { display: inline-block; }
+@media (max-width: 560px) {
+  .q { padding: 14px 14px 12px; }
+  .ans .row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .opts li { grid-template-columns: 20px minmax(0, 1fr); }
+  .opts .bdg { grid-column: 2; justify-content: flex-start; }
+}
+
+/* figures */
+.fig { margin: 0; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 16px 12px; display: grid; gap: 10px; }
+.fig-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.fig svg { display: block; width: 100%; height: auto; min-width: 620px; }
+.fig.small svg { min-width: 0; }
+.fig figcaption { font-size: 13px; color: var(--ink-2); line-height: 1.7; }
+.fig figcaption b { color: var(--ink); font-family: var(--f-display); margin-right: 6px; }
+.fig text { font-family: var(--f-body); font-size: 12px; fill: var(--ink); }
+.fig .tb { font-weight: 700; font-size: 13px; }
+.fig .th { font-family: var(--f-display); font-weight: 700; font-size: 14px; }
+.fig .ts { font-size: 11px; fill: var(--ink-2); }
+.fig .tm { font-family: var(--f-mono); font-size: 11.5px; }
+.fig .tw { fill: #FFFFFF; }
+.fig .tr { fill: var(--bad); }
+.fig .tg { fill: var(--good); }
+.fig .t3 { fill: var(--ink-3); }
+.fig .c1 { fill: var(--d1-ink); } .fig .c2 { fill: var(--d2-ink); } .fig .c3 { fill: var(--d3-ink); } .fig .c4 { fill: var(--d4-ink); } .fig .c5 { fill: var(--d5-ink); } .fig .c6 { fill: var(--d6-ink); }
+.fig .bx { fill: var(--sheet); stroke: var(--line-strong); stroke-width: 1.2; }
+.fig .bx-ink { fill: var(--sheet); stroke: var(--ink); stroke-width: 1.6; }
+.fig .bx-soft { fill: var(--paper); stroke: var(--rule); stroke-width: 1; }
+.fig .bx-g { fill: var(--paper-2); stroke: none; }
+.fig .bx-dark { fill: var(--ink); stroke: none; }
+.fig .bx-d1 { fill: var(--d1-tint); stroke: var(--d1); stroke-width: 1.4; }
+.fig .bx-d2 { fill: var(--d2-tint); stroke: var(--d2); stroke-width: 1.4; }
+.fig .bx-d3 { fill: var(--d3-tint); stroke: var(--d3); stroke-width: 1.4; }
+.fig .bx-d4 { fill: var(--d4-tint); stroke: var(--d4); stroke-width: 1.4; }
+.fig .bx-d5 { fill: var(--d5-tint); stroke: var(--d5); stroke-width: 1.4; }
+.fig .bx-d6 { fill: var(--d6-tint); stroke: var(--d6); stroke-width: 1.4; }
+.fig .bx-bad { fill: var(--bad-tint); stroke: var(--bad); stroke-width: 1.4; }
+.fig .bx-good { fill: var(--good-tint); stroke: var(--good); stroke-width: 1.4; }
+.fig .zone { fill: none; stroke: var(--ink-3); stroke-width: 1.3; stroke-dasharray: 6 4; }
+.fig .zone-d1 { fill: none; stroke: var(--d1); stroke-width: 1.6; stroke-dasharray: 7 4; }
+.fig .zone-d2 { fill: none; stroke: var(--d2); stroke-width: 1.8; stroke-dasharray: 7 4; }
+.fig .zone-bad { fill: none; stroke: var(--bad); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.fig .ln { fill: none; stroke: var(--ink-2); stroke-width: 1.5; }
+.fig .ln-ink { fill: none; stroke: var(--ink); stroke-width: 1.8; }
+.fig .ln-bad { fill: none; stroke: var(--bad); stroke-width: 1.6; }
+.fig .ln-good { fill: none; stroke: var(--good); stroke-width: 1.8; }
+.fig .ln-d4 { fill: none; stroke: var(--d4); stroke-width: 1.4; }
+.fig .dash { stroke-dasharray: 5 4; }
+.fig .mk { fill: var(--ink-2); }
+.fig .mk-ink { fill: var(--ink); }
+.fig .mk-bad { fill: var(--bad); }
+.fig .mk-good { fill: var(--good); }
+.fig .mk-d4 { fill: var(--d4); }
+.fig .f-d1 { fill: var(--d1); } .fig .f-d2 { fill: var(--d2); } .fig .f-d3 { fill: var(--d3); } .fig .f-d4 { fill: var(--d4); } .fig .f-d5 { fill: var(--d5); } .fig .f-d6 { fill: var(--d6); }
+.fig .f-bad { fill: var(--bad); } .fig .f-good { fill: var(--good); } .fig .f-ink { fill: var(--ink); } .fig .f-sheet { fill: var(--sheet); }
+
+/* tables */
+.tscroll { overflow-x: auto; -webkit-overflow-scrolling: touch; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); }
+table.tbl { border-collapse: collapse; width: 100%; font-size: 13.5px; line-height: 1.65; }
+.tbl th, .tbl td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--rule); }
+.tbl thead th { font-family: var(--f-display); font-weight: 700; font-size: 12.5px; color: var(--ink-2); background: var(--paper); white-space: nowrap; letter-spacing: .03em; }
+.tbl tbody tr:last-child td, .tbl tbody tr:last-child th { border-bottom: 0; }
+.tbl tbody th { font-weight: 700; white-space: nowrap; }
+.tbl td.num, .tbl th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tbl .w-term { min-width: 9.5em; }
+.tbl .nowrap { white-space: nowrap; }
+.tbl tr.hit td, .tbl tr.hit th { background: #FFF8DA; }
+.tbl .o { font-weight: 700; color: var(--ink); }
+.tbl .x { color: var(--bad); font-weight: 700; }
+.tbl code { font-size: 12px; }
+.tbl.glossary td:first-child { white-space: nowrap; font-weight: 700; }
+
+/* callouts */
+.rule-box { background: var(--sheet); border: 1.5px solid var(--ink); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 8px; }
+.rule-box .rb-lab { font-family: var(--f-mono); font-size: 11.5px; font-weight: 600; letter-spacing: .08em; color: var(--ink-2); }
+.rule-box h4 { margin: 0; font-family: var(--f-display); font-size: 17px; font-weight: 700; }
+.rule-box p { margin: 0; }
+.rule-box.alert { border-color: var(--bad); }
+.rule-box.alert .rb-lab { color: var(--bad); }
+
+/* grids */
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 720px) { .trio { grid-template-columns: minmax(0, 1fr); } }
+.cell { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 14px; display: grid; gap: 6px; align-content: start; }
+.cell h4 { margin: 0; font-family: var(--f-display); font-size: 16px; }
+.cell .en { font-family: var(--f-mono); font-size: 11.5px; color: var(--ink-3); font-weight: 400; margin-left: 6px; }
+.cell p { margin: 0; font-size: 13.5px; line-height: 1.7; }
+.cell .lbl { font-size: 11.5px; color: var(--ink-3); font-weight: 700; letter-spacing: .04em; }
+
+/* domain accuracy chart */
+.acc { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 18px 14px; display: grid; gap: 10px; }
+.acc-row { display: grid; grid-template-columns: 13.5em 4.2em minmax(120px, 1fr) 6.6em; gap: 12px; align-items: center; font-size: 13.5px; }
+.acc-row.head { font-size: 11.5px; color: var(--ink-3); font-weight: 700; letter-spacing: .04em; }
+.acc-name { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+.acc-name small { font-family: var(--f-mono); font-weight: 500; color: var(--ink-3); font-size: 11.5px; }
+.acc-w { font-variant-numeric: tabular-nums; color: var(--ink-2); text-align: right; }
+.acc-bar { position: relative; height: 14px; background: var(--paper-2); border-radius: 0 4px 4px 0; }
+.acc-bar i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 0 4px 4px 0; }
+.acc-bar i.d1 { background: var(--d1); } .acc-bar i.d2 { background: var(--d2); } .acc-bar i.d3 { background: var(--d3); } .acc-bar i.d4 { background: var(--d4); } .acc-bar i.d5 { background: var(--d5); } .acc-bar i.d6 { background: var(--d6); }
+.acc-bar .tick { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--line-strong); }
+.acc-v { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.acc-v b { font-family: var(--f-display); font-size: 15px; }
+.acc-axis { display: grid; grid-template-columns: 13.5em 4.2em minmax(120px, 1fr) 6.6em; gap: 12px; font-size: 11px; color: var(--ink-3); }
+.acc-axis span { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .acc-row, .acc-axis { grid-template-columns: minmax(0, 1fr) 5.5em; }
+  .acc-row .acc-w { display: none; }
+  .acc-row .acc-bar { grid-column: 1 / -1; grid-row: 2; }
+  .acc-axis span:first-child, .acc-axis span:nth-child(2), .acc-axis span:last-child { display: none; }
+  .acc-axis span:nth-child(3) { grid-column: 1 / -1; }
+  .acc-row.head { display: none; }
+}
+
+/* steps */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: st; }
+.steps li { counter-increment: st; display: grid; grid-template-columns: 30px minmax(0, 1fr); gap: 10px; align-items: baseline; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 10px 14px; }
+.steps li::before { content: counter(st); font-family: var(--f-display); font-weight: 900; font-size: 18px; color: var(--ink); text-align: center; }
+.steps li b { display: inline; }
+
+/* pattern list */
+.pat { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 16px 18px; display: grid; gap: 8px; }
+.pat-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.pat-head h4 { margin: 0; font-family: var(--f-display); font-size: 17px; font-weight: 700; }
+.pat-head .cnt { font-family: var(--f-display); font-weight: 900; font-size: 22px; font-variant-numeric: tabular-nums; }
+.pat-head .cnt small { font-size: 13px; font-weight: 500; color: var(--ink-2); margin-left: 2px; }
+.pat p { margin: 0; }
+.qlinks { display: flex; flex-wrap: wrap; gap: 6px; }
+.qlinks a { font-family: var(--f-mono); font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 4px; background: var(--paper-2); color: var(--ink); text-decoration: none; }
+.qlinks a:hover { background: var(--ink); color: #fff; }
+.pat .fix { font-weight: 700; }
+
+footer.foot { font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 4px; }
+footer.foot p { margin: 0; }
+</style>
+
+<header class="hero">
+  <div class="hero-in">
+    <p class="eyebrow">{{試験の正式名（英語）}}</p>
+    <h1>{{略称}} 模試復習帳</h1>
+    <p class="lead">{{何問中何問を、公式ガイドの何分野に並べ替えたか。読む順番。}}</p>
+    <dl class="facts">
+      <div><dt>受験日</dt><dd>{{M/D}} <small>{{曜}}・あと<span id="daysLeft" data-exam="{{YYYY-MM-DD}}">{{N}}</span>日</small></dd></div>
+      <div><dt>{{演習N}} の正答</dt><dd>{{正答}} / {{問題数}} <small>{{%}}</small></dd></div>
+      <div><dt>間違えた問題</dt><dd>{{誤答数}} <small>問</small></dd></div>
+      <div class="warn"><dt>{{最大の失点パターン}}</dt><dd>{{数}} <small>問</small></dd></div>
+    </dl>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc" aria-label="目次と復習ツール">
+  <div class="tools">
+    <button class="btn" id="quizToggle" type="button" aria-pressed="false">答えを伏せて解き直す</button>
+    <p>押すと各カードの正解・自分の答え・解説が隠れる。カードごとの「答えを見る」で1問ずつ確認できる。</p>
+    <div class="progress"><span>「次は解ける」</span><b id="doneCount">0</b><span>/ <span id="doneTotal">0</span></span></div>
+    <div class="meter" aria-hidden="true"><i id="doneBar"></i></div>
+  </div>
+  <nav class="toc-nav" aria-label="目次">
+    <ol>
+      <li><a href="#overview"><span class="dot ring"></span>試験の全体像</a>
+        <ol>
+          <li><a href="#format">試験の形式</a></li>
+          <li><a href="#domains">分野と自分の正答率</a></li>
+          <li><a href="#reading">問題文の読み方</a></li>
+          <li><a href="#keywords">この言葉が出たらこれ</a></li>
+        </ol>
+      </li>
+      <li><a href="#basics"><span class="dot ring"></span>{{分野の}}基礎用語</a></li>
+      <li><a href="#d1"><span class="dot d1"></span>分野1 {{分野名}}</a></li>
+      <li><a href="#patterns"><span class="dot ring"></span>間違いのパターン</a></li>
+      <li><a href="#errata"><span class="dot ring"></span>採点キーへの注意</a></li>
+      <li><a href="#index"><span class="dot ring"></span>全問の一覧</a></li>
+    </ol>
+  </nav>
+</aside>
+
+<main>
+
+<section class="chap" id="overview">
+  <header class="chap-head">
+    <span class="tag">OVERVIEW</span>
+    <h2>試験の全体像</h2>
+    <p>{{何が、どの比重で、どう問われるか。出典（公式ガイドの版）。}}</p>
+  </header>
+  <div class="sec" id="format">
+    <h3>試験の形式</h3>
+    <div class="tscroll"><table class="tbl"><tbody>
+      <tr><th>時間</th><td>{{時間}}</td></tr>
+      <tr><th>問題数</th><td>{{問題数と形式}}</td></tr>
+      <tr><th>合格点</th><td>{{公表値。非公表ならそう書く}}</td></tr>
+    </tbody></table></div>
+  </div>
+  <div class="sec" id="domains">
+    <h3>分野と、{{演習N}} での自分の正答率</h3>
+    <div class="acc" role="img" aria-label="{{全分野の正答率を文章で}}">
+      <div class="acc-row head"><span>分野</span><span class="acc-w">配点</span><span>正答率</span><span class="acc-v">正答 / 出題</span></div>
+      <div class="acc-row" title="{{分野1: x問中y問正解}}">
+        <span class="acc-name"><span class="dot d1"></span>{{分野名}} <small>1</small></span>
+        <span class="acc-w">約{{配点}}%</span>
+        <span class="acc-bar"><i class="d1" style="width:{{正答率}}%"></i><span class="tick" style="left:50%"></span></span>
+        <span class="acc-v"><b>{{y}}</b> / {{x}} · {{正答率}}%</span>
+      </div>
+      <div class="acc-axis" aria-hidden="true"><span></span><span></span><span><em style="font-style:normal">0%</em><em style="font-style:normal">50%</em><em style="font-style:normal">100%</em></span><span></span></div>
+    </div>
+  </div>
+  <div class="sec" id="reading">
+    <h3>問題文の読み方</h3>
+    <ol class="steps">
+      <li><div><b>{{手順}}</b>{{説明}}</div></li>
+    </ol>
+  </div>
+  <div class="sec" id="keywords">
+    <h3>この言葉が出たらこれ</h3>
+    <div class="tscroll"><table class="tbl">
+      <thead><tr><th>問題文の言葉</th><th>まず疑う答え</th><th>分野</th></tr></thead>
+      <tbody>
+        <tr class="hit"><td>{{言葉。落とした組み合わせは hit}}</td><td>{{答え}}</td><td><span class="chip d1">1</span></td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="chap" id="basics">
+  <header class="chap-head">
+    <span class="tag">FUNDAMENTALS</span>
+    <h2>{{分野の}}基礎用語</h2>
+  </header>
+  <div class="sec" id="b-1">
+    <h3>{{用語のまとまり}}</h3>
+    <div class="tscroll"><table class="tbl glossary">
+      <thead><tr><th>用語</th><th>意味</th><th>{{製品・試験}}では</th></tr></thead>
+      <tbody><tr><td>{{用語}}</td><td>{{一般的な意味}}</td><td>{{対応する製品・設定。関係する問題へのリンク}}</td></tr></tbody>
+    </table></div>
+  </div>
+</section>
+
+<section class="chap d1" id="d1">
+  <header class="chap-head">
+    <span class="tag"><span class="chip d1">分野 1</span>試験ガイド {{1.x}} · 配点 約{{配点}}%</span>
+    <h2>{{分野名}}</h2>
+    <p>{{この分野が問うことを1文で}}</p>
+    <div class="dstat"><span>{{演習N}} の出題 <b>{{x}}</b></span><span>正答 <b>{{y}}</b></span><span>間違い <b>{{x-y}}</b></span></div>
+  </header>
+  <div class="sec" id="d1-principle">
+    <h3>{{原理を主張の形で}}</h3>
+    <p>{{仕組みの説明}}</p>
+    <figure class="fig" id="fig-d1-1">
+      <div class="fig-scroll">
+        <svg viewBox="0 0 760 120" role="img" aria-label="{{図が示す主張}}">
+          <defs><marker id="fd1-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" class="mk-ink"/></marker></defs>
+          <rect x="16" y="30" width="200" height="60" rx="5" class="bx-soft"/>
+          <text x="116" y="66" text-anchor="middle" class="tb">{{箱}}</text>
+          <line x1="216" y1="60" x2="300" y2="60" class="ln-ink" marker-end="url(#fd1-a)"/>
+          <text x="258" y="52" text-anchor="middle" class="ts">{{矢印の意味}}</text>
+          <rect x="302" y="30" width="200" height="60" rx="5" class="bx-d1"/>
+          <text x="402" y="66" text-anchor="middle" class="tb">{{箱}}</text>
+        </svg>
+      </div>
+      <figcaption><b>図 D1-1</b>{{何が分かるか。関係する問題へのリンク}}（<a href="#m1-q1">Q1</a>）</figcaption>
+    </figure>
+  </div>
+  <div class="sec" id="d1-table">
+    <h3>覚える表</h3>
+    <div class="tscroll"><table class="tbl">
+      <thead><tr><th>{{名前}}</th><th>できること</th><th>できないこと・注意</th></tr></thead>
+      <tbody><tr class="hit"><td><b>{{名前}}</b><br><code>{{ID}}</code></td><td>{{}}</td><td>{{}}</td></tr></tbody>
+    </table></div>
+  </div>
+  <div class="sec" id="d1-cards">
+    <h3>間違えた問題</h3>
+    <div class="cards">
+      <article class="q" id="m1-q1">
+        <header class="q-head"><span class="q-no">{{演習1}} · Q1</span><span class="chip d1">{{1.x 小分野}}</span><span class="chip multi">2つ選択</span><span class="sp"></span><label class="done"><input type="checkbox" id="done-m1-q1" data-q="m1-q1">次は解ける</label></header>
+        <p class="q-text">{{問題文を要約。制約語は <span class="kw">…</span> で囲む}}</p>
+        <ol class="opts">
+          <li class="ok"><span class="k">A</span><span>{{選択肢}}</span><span class="bdg"><span class="badge ok">○ 正解</span></span></li>
+          <li class="ok mine"><span class="k">B</span><span>{{選択肢}}</span><span class="bdg"><span class="badge ok">○ 正解</span><span class="badge mine">自分</span></span></li>
+          <li class="mine"><span class="k">C</span><span>{{選択肢}}</span><span class="bdg"><span class="badge mine">× 自分</span></span></li>
+          <li><span class="k">D</span><span>{{選択肢}}</span><span class="bdg"></span></li>
+        </ol>
+        <div class="ans">
+          <p class="row trap"><span class="lab">引っかかり</span><span>{{自分の選択肢がなぜ外れか}}</span></p>
+          <p class="row key"><span class="lab">決め手</span><span>{{正解を選ぶ根拠の1文}}</span></p>
+          <p>{{仕組みの補足}}</p>
+          <p class="note"><b>採点キー注：</b>{{解説自身が採点キーを疑っている場合だけ}}</p>
+          <p class="ref">→ <a href="#fig-d1-1">図 D1-1</a></p>
+        </div>
+        <button class="btn reveal" type="button">答えを見る</button>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="chap" id="patterns">
+  <header class="chap-head">
+    <span class="tag">PATTERNS</span>
+    <h2>間違いのパターン</h2>
+    <p>{{誤答を「なぜ外したか」で分けた結果の要約}}</p>
+  </header>
+  <div class="rule-box alert">
+    <span class="rb-lab">最優先</span>
+    <h4>{{一番効く読み方のルール}}</h4>
+    <p>{{根拠の数字}}</p>
+  </div>
+  <div class="pat">
+    <div class="pat-head"><h4>{{A. パターン名}}</h4><span class="cnt">{{数}}<small>問</small></span></div>
+    <div class="qlinks"><a href="#m1-q1">Q1</a></div>
+    <p>{{どの問題で、どう外したか}}</p>
+    <p class="fix">次から：{{行動}}</p>
+  </div>
+</section>
+
+<section class="chap" id="errata">
+  <header class="chap-head">
+    <span class="tag">ANSWER KEY NOTES</span>
+    <h2>採点キーへの注意</h2>
+  </header>
+  <div class="tscroll"><table class="tbl">
+    <thead><tr><th>問題</th><th>採点キー</th><th>問題点</th><th>本番での読み方</th></tr></thead>
+    <tbody><tr><td class="nowrap"><a href="#m1-q1">Q1</a></td><td>{{}}</td><td>{{}}</td><td>{{}}</td></tr></tbody>
+  </table></div>
+</section>
+
+<section class="chap" id="index">
+  <header class="chap-head">
+    <span class="tag">ALL</span>
+    <h2>全問の一覧</h2>
+  </header>
+  <div class="tscroll"><table class="tbl">
+    <thead><tr><th>問題</th><th>分野</th><th>テーマ</th><th>自分</th><th>正解</th><th>一行で</th><th>型</th></tr></thead>
+    <tbody><tr><td><a href="#m1-q1">Q1</a></td><td><span class="chip d1">1</span></td><td>{{}}</td><td class="x">C</td><td class="o">A, B</td><td>{{}}</td><td>A</td></tr></tbody>
+  </table></div>
+  <footer class="foot">
+    <p>出典：{{模試の名前}}。分野の配点と内容は{{公式ガイドの名前と版}}による。</p>
+    <p>作成 {{YYYY-MM-DD}}。「次は解ける」のチェックはこのブラウザにだけ保存される。</p>
+  </footer>
+</section>
+
+</main>
+</div>
+
+<!-- 模試ごとの答え。parse_mock.py --snippet mN の出力（script type="application/json" id="mock-mN"）を、演習・回ごとにここへ並べる -->
+<script>
+(function () {
+  var KEY = 'review-done-{{exam-slug}}-v1';
+  var store = {};
+  try { store = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { store = {}; }
+  var boxes = Array.prototype.slice.call(document.querySelectorAll('.done input[type="checkbox"]'));
+  var countEl = document.getElementById('doneCount');
+  var barEl = document.getElementById('doneBar');
+  document.getElementById('doneTotal').textContent = boxes.length;
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(store)); } catch (e) {} }
+  function render() {
+    var n = boxes.filter(function (b) { return b.checked; }).length;
+    countEl.textContent = n;
+    barEl.style.width = (boxes.length ? (n / boxes.length) * 100 : 0) + '%';
+  }
+  boxes.forEach(function (b) {
+    if (store[b.dataset.q]) b.checked = true;
+    b.addEventListener('change', function () {
+      if (b.checked) { store[b.dataset.q] = 1; } else { delete store[b.dataset.q]; }
+      save();
+      render();
+    });
+  });
+  render();
+
+  var btn = document.getElementById('quizToggle');
+  var reveals = Array.prototype.slice.call(document.querySelectorAll('.q .reveal'));
+  btn.addEventListener('click', function () {
+    var on = !document.body.classList.contains('quiz');
+    document.body.classList.toggle('quiz', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    btn.textContent = on ? '答えをすべて表示する' : '答えを伏せて解き直す';
+    document.querySelectorAll('.q.open').forEach(function (q) { q.classList.remove('open'); });
+    reveals.forEach(function (r) { r.textContent = '答えを見る'; });
+  });
+  reveals.forEach(function (r) {
+    r.addEventListener('click', function () {
+      var q = r.closest('.q');
+      var open = q.classList.toggle('open');
+      r.textContent = open ? '答えを隠す' : '答えを見る';
+    });
+  });
+
+  var el = document.getElementById('daysLeft');
+  if (el && el.dataset.exam) {
+    var p = el.dataset.exam.split('-');
+    var now = new Date();
+    var today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var d = Math.round((new Date(+p[0], +p[1] - 1, +p[2]) - today) / 86400000);
+    if (d > 0) { el.textContent = d; }
+    else { el.parentNode.textContent = d === 0 ? '今日' : '受験済み'; }
+  }
+})();
+</script>
