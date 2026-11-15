@@ -1,10 +1,13 @@
 """Parse a mock-exam export (Udemy-style Markdown) into JSON and print a summary.
 
-usage: python3 -I parse_mock.py <mock.md> [--out q.json] [--domains map.json] [--snippet ID] [--prev FILE [--prev-id ID]]
+usage: python3 -I parse_mock.py <mock.md> [--out q.json] [--domains map.json] [--marked marked.md]
+                                [--snippet ID] [--prev FILE [--prev-id ID]]
 
 --out      full JSON (question text, options, explanations) for writing cards
 --domains  JSON {"<question no>": "<guide subsection, e.g. 1.4>"}; adds the
            per-domain score to the summary and "d" to each question
+--marked   the same mock exported with the "マーク済み" (marked for review) filter on;
+           flags those questions as marked ("m": true) after matching question text
 --snippet  also print <script type="application/json" id="mock-ID"> with the
            answers only; paste it into the sheet so later retakes can compare
            even after the export file is gone
@@ -83,6 +86,11 @@ def summary(data, prev=None):
            "  under-selected (picked fewer than required): " + (", ".join(f"Q{q['n']}({''.join(q['mine'])}/{''.join(q['correct'])})" for q in qs if q["under_selected"]) or "none"),
            "unanswered: " + (", ".join(f"Q{q['n']}" for q in qs if q["unanswered"]) or "none"),
            "answer key flagged by the explanation itself: " + (", ".join(f"Q{q['n']}" for q in qs if q["key_flags"]) or "none")]
+    marked = [q for q in qs if q.get("marked")]
+    if marked:
+        out.append(f"marked for review: {len(marked)} (correct: "
+                   + (", ".join(f"Q{q['n']}" for q in marked if q["is_correct"]) or "none")
+                   + "; wrong: " + (", ".join(f"Q{q['n']}" for q in marked if not q["is_correct"]) or "none") + ")")
     if doms:
         out.append("by domain: " + ", ".join(f"{k}: {v[0]}/{v[1]}" for k, v in sorted(doms.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 99)))
         miss = [f"Q{q['n']}" for q in qs if not q.get("d")]
@@ -146,13 +154,21 @@ def main(argv):
             if str(q["n"]) in dmap:
                 q["d"] = dmap[str(q["n"])]
     prev = load_prev(arg("--prev"), arg("--prev-id")) if arg("--prev") else None
+    if arg("--marked"):
+        by_n = {q["n"]: q for q in data["questions"]}
+        for mq in parse(arg("--marked"))["questions"]:
+            q = by_n.get(mq["n"])
+            if q and q["h"] == mq["h"]:
+                q["marked"] = True
+            else:
+                print(f"WARNING marked Q{mq['n']} does not match a question in {argv[1]}; skipped")
     if arg("--out"):
         with open(arg("--out"), "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=1)
     print(summary(data, prev))
     if arg("--snippet"):
         slim = {"title": data["title"], "questions": [
-            {k: q[k] for k in ("n", "h", "d", "correct", "mine", "is_correct") if k in q} for q in data["questions"]]}
+            {k: q[k] for k in ("n", "h", "d", "correct", "mine", "is_correct", "marked") if k in q} for q in data["questions"]]}
         print(f'\n<script type="application/json" id="mock-{arg("--snippet")}">'
               + json.dumps(slim, ensure_ascii=False, separators=(",", ":")) + "</script>")
 

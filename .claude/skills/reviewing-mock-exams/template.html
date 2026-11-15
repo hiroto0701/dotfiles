@@ -125,6 +125,7 @@ nav.toc-nav ol ol a:hover { background: var(--paper-2); color: var(--ink); }
 .sec ul, .sec ol.plain { margin: 0; padding-left: 1.3em; display: grid; gap: 4px; }
 .subhead { font-family: var(--f-display); font-weight: 700; font-size: 13px; letter-spacing: .06em; color: var(--ink-2); margin: 0; }
 .cards { display: grid; gap: 18px; }
+.sec pre.code { margin: 0; background: var(--paper-2); border-radius: var(--r); padding: 12px 14px; overflow-x: auto; font-family: var(--f-mono); font-size: 12.5px; line-height: 1.6; color: var(--ink); white-space: pre; }
 
 /* stat line per domain */
 .dstat { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; color: var(--ink-2); }
@@ -144,6 +145,8 @@ nav.toc-nav ol ol a:hover { background: var(--paper-2); color: var(--ink); }
 .chip.pat { background: var(--sheet); box-shadow: inset 0 0 0 1px var(--line-strong); color: var(--ink-2); font-weight: 400; }
 .chip.r-ok { background: var(--good-tint); color: var(--good); } .chip.r-ok::before { background: var(--good); }
 .chip.r-ng { background: var(--bad-tint); color: var(--bad); } .chip.r-ng::before { background: var(--bad); }
+.chip.mark { background: var(--sheet); border: 1px dashed var(--ink-2); color: var(--ink-2); line-height: 1.6; }
+.chip.mark::before { display: none; }
 .chip.pat::before { display: none; }
 
 /* question card */
