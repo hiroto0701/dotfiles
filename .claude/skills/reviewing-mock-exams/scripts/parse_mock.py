@@ -6,8 +6,10 @@ usage: python3 -I parse_mock.py <mock.md> [--out q.json] [--domains map.json] [-
 --out      full JSON (question text, options, explanations) for writing cards
 --domains  JSON {"<question no>": "<guide subsection, e.g. 1.4>"}; adds the
            per-domain score to the summary and "d" to each question
---marked   the same mock exported with the "マーク済み" (marked for review) filter on;
-           flags those questions as marked ("m": true) after matching question text
+           review marks are read from "- 見直し: マーク済み" lines, which the bookmarklet
+           writes into the full export since 2026-11-16
+--marked   for older exports without those lines: the same mock exported with the
+           "マーク済み" filter on; flags matching questions (by question text) as marked
 --snippet  also print <script type="application/json" id="mock-ID"> with the
            answers only; paste it into the sheet so later retakes can compare
            even after the export file is gone
@@ -50,7 +52,7 @@ def parse(path):
         flags = sorted({t for t in FLAG_TERMS if t in b})
         is_correct = sorted(correct) == sorted(mine_l) and bool(correct)
         qtext = body_q.group(1).strip() if body_q else ""
-        qs.append({
+        q = {
             "n": n,
             "h": hashlib.sha1(re.sub(r"\s+", "", qtext).encode("utf-8")).hexdigest()[:8],
             "correct": correct,
@@ -64,8 +66,12 @@ def parse(path):
             "per_option": per_opt,
             "explanation": expl_t,
             "key_flags": flags,
-        })
-    return {"title": title.group(1).strip() if title else path, "questions": qs}
+        }
+        if re.search(r"(?m)^- 見直し:\s*マーク済み\s*$", b):
+            q["marked"] = True
+        qs.append(q)
+    return {"title": title.group(1).strip() if title else path, "questions": qs,
+            "marks_in_export": bool(re.search(r"(?m)^- 見直しマーク:", text))}
 
 
 def summary(data, prev=None):
@@ -91,6 +97,10 @@ def summary(data, prev=None):
         out.append(f"marked for review: {len(marked)} (correct: "
                    + (", ".join(f"Q{q['n']}" for q in marked if q["is_correct"]) or "none")
                    + "; wrong: " + (", ".join(f"Q{q['n']}" for q in marked if not q["is_correct"]) or "none") + ")")
+    elif data.get("marks_in_export"):
+        out.append("marked for review: none")
+    else:
+        out.append("NOTE review marks are not in this export; re-export from the live review page with the bookmarklet, or pass --marked")
     if doms:
         out.append("by domain: " + ", ".join(f"{k}: {v[0]}/{v[1]}" for k, v in sorted(doms.items(), key=lambda x: int(x[0]) if x[0].isdigit() else 99)))
         miss = [f"Q{q['n']}" for q in qs if not q.get("d")]
@@ -155,6 +165,7 @@ def main(argv):
                 q["d"] = dmap[str(q["n"])]
     prev = load_prev(arg("--prev"), arg("--prev-id")) if arg("--prev") else None
     if arg("--marked"):
+        data["marks_in_export"] = True
         by_n = {q["n"]: q for q in data["questions"]}
         for mq in parse(arg("--marked"))["questions"]:
             q = by_n.get(mq["n"])
