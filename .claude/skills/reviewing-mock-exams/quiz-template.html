@@ -1,0 +1,629 @@
+<title>{{QUIZ_TITLE}}</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=IBM+Plex+Mono:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap">
+<style>
+/* Layout: 1問ずつのカード。上に固定のバー（セット名・進み・正解数）、下に固定の回答バー。スマホの片手操作を先に考え、PC では 760px の本文幅。色と書体は模試復習帳と同じ。ライト固定（学習資料はライトで統一する本人の希望）。 */
+:root {
+  --paper: #F3F5F8;
+  --sheet: #FFFFFF;
+  --paper-2: #E8ECF2;
+  --ink: #16203A;
+  --ink-2: #48526A;
+  --ink-3: #7C859A;
+  --rule: #D8DEE8;
+  --line-strong: #9AA3B5;
+  --accent: #1E3F94;
+  --accent-tint: #EDF1FA;
+  --hl: #FFE27A;
+  --bad: #C2333B; --bad-tint: #FBEDED;
+  --good: #137A47; --good-tint: #E7F4EC;
+  --warn: #855A00; --warn-tint: #FDF3DC;
+  --d1: #2a78d6; --d1-ink: #1C5BA9; --d1-tint: #EAF2FC;
+  --d2: #eb6834; --d2-ink: #B04415; --d2-tint: #FDEFE8;
+  --d3: #1baf7a; --d3-ink: #0D7550; --d3-tint: #E5F6EE;
+  --d4: #eda100; --d4-ink: #855A00; --d4-tint: #FDF3DC;
+  --d5: #e87ba4; --d5-ink: #AE3866; --d5-tint: #FCEDF3;
+  --d6: #6250d6; --d6-ink: #4B3BB8; --d6-tint: #EEECFB;
+  --f-display: "Zen Kaku Gothic New", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  --f-body: "BIZ UDPGothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --r: 6px;
+  --bar-h: 56px;
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+}
+html { scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 12px); }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--f-body); font-size: 15.5px; line-height: 1.8; -webkit-text-size-adjust: 100%; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
+[hidden]:not([hidden="until-found"]) { display: none !important; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+code { font-family: var(--f-mono); font-size: .88em; background: var(--paper-2); padding: 1px 5px; border-radius: 3px; word-break: break-all; }
+b, strong { font-weight: 700; }
+.kw { background: linear-gradient(transparent 58%, var(--hl) 58%); padding: 0 1px; }
+button { font: inherit; color: inherit; }
+
+/* top bar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); }
+.bar-in { max-width: 760px; margin: 0 auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); height: var(--bar-h); box-sizing: border-box; display: flex; align-items: center; gap: 12px; }
+.ghost { flex: none; cursor: pointer; border: 1px solid var(--rule); background: var(--sheet); border-radius: 6px; padding: 6px 10px; font-size: 13px; font-weight: 700; color: var(--ink-2); line-height: 1.3; }
+.ghost:hover { border-color: var(--ink-2); color: var(--ink); }
+.bar-title { flex: 1 1 auto; min-width: 0; display: grid; line-height: 1.35; }
+.bar-title b { font-family: var(--f-display); font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-title span { font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+.bar-score { flex: none; font-size: 12.5px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; line-height: 1.35; }
+.bar-score b { font-family: var(--f-display); font-size: 17px; color: var(--good); }
+.meter { height: 3px; background: var(--paper-2); }
+.meter i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .2s; }
+@media (prefers-reduced-motion: reduce) { .meter i { transition: none; } }
+
+main { max-width: 760px; margin: 0 auto; padding-left: var(--gutter-l); padding-right: var(--gutter-r); padding-block: 22px calc(120px + env(safe-area-inset-bottom, 0px)); box-sizing: border-box; }
+
+/* home */
+.home { display: grid; gap: 22px; }
+.home h1 { margin: 6px 0 0; font-family: var(--f-display); font-weight: 900; font-size: clamp(26px, 6vw, 34px); line-height: 1.25; text-wrap: balance; }
+.lead { margin: 0; color: var(--ink-2); max-width: 40em; }
+.record { margin: 0; display: flex; flex-wrap: wrap; gap: 10px 28px; padding: 14px 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); }
+.record div { display: grid; }
+.record dt { font-size: 12px; color: var(--ink-3); letter-spacing: .04em; }
+.record dd { margin: 0; font-family: var(--f-display); font-weight: 700; font-size: 20px; font-variant-numeric: tabular-nums; }
+.record dd small { font-family: var(--f-body); font-weight: 400; font-size: 13px; color: var(--ink-2); margin-left: 4px; }
+.store-note { margin: -12px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.resume { display: grid; gap: 10px; padding: 14px 16px; background: var(--accent-tint); border: 1px solid var(--accent); border-radius: var(--r); }
+.resume p { margin: 0; font-size: 14px; }
+.sets { margin: 0; padding: 0; border: 0; display: grid; gap: 8px; min-width: 0; }
+.sets legend { padding: 0; margin-bottom: 8px; font-family: var(--f-display); font-weight: 700; font-size: 17px; }
+.group-label { margin: 8px 0 0; font-family: var(--f-display); font-weight: 700; font-size: 12.5px; color: var(--ink-2); letter-spacing: .06em; }
+.set { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; gap: 2px 12px; align-items: center; padding: 12px 14px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); cursor: pointer; }
+.set:hover { border-color: var(--line-strong); }
+.set:has(input:checked) { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.set input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+.set-name { font-weight: 700; display: flex; align-items: center; gap: 8px; min-width: 0; }
+.set-count { font-size: 12.5px; color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; text-align: right; }
+.set-count b { font-family: var(--f-display); font-size: 16px; color: var(--ink); }
+.set-desc { grid-column: 2 / -1; font-size: 12.5px; color: var(--ink-2); line-height: 1.6; }
+.toggles { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.toggles label { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; }
+.toggles input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
+.start-row { display: grid; gap: 8px; }
+.start-row p { margin: 0; font-size: 13px; color: var(--ink-2); }
+.btn { cursor: pointer; border-radius: 8px; padding: 11px 18px; border: 1px solid var(--ink); background: var(--ink); color: #fff; font-size: 15px; font-weight: 700; line-height: 1.3; text-align: center; }
+.btn:hover { background: var(--accent); border-color: var(--accent); }
+.btn:disabled { cursor: not-allowed; background: var(--paper-2); border-color: var(--rule); color: var(--ink-3); }
+.btn.sub { background: var(--sheet); color: var(--ink); }
+.btn.sub:hover { background: var(--paper-2); border-color: var(--ink); }
+.foot { font-size: 12px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 14px; margin: 0; }
+
+/* chips */
+.dot { width: 10px; height: 10px; border-radius: 50%; flex: none; background: var(--ink-3); }
+.dot.d1 { background: var(--d1); } .dot.d2 { background: var(--d2); } .dot.d3 { background: var(--d3); } .dot.d4 { background: var(--d4); } .dot.d5 { background: var(--d5); } .dot.d6 { background: var(--d6); }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; padding: 1px 9px 1px 7px; border-radius: 99px; background: var(--paper-2); color: var(--ink); white-space: nowrap; line-height: 1.7; }
+.chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); }
+.chip.d1 { background: var(--d1-tint); color: var(--d1-ink); } .chip.d1::before { background: var(--d1); }
+.chip.d2 { background: var(--d2-tint); color: var(--d2-ink); } .chip.d2::before { background: var(--d2); }
+.chip.d3 { background: var(--d3-tint); color: var(--d3-ink); } .chip.d3::before { background: var(--d3); }
+.chip.d4 { background: var(--d4-tint); color: var(--d4-ink); } .chip.d4::before { background: var(--d4); }
+.chip.d5 { background: var(--d5-tint); color: var(--d5-ink); } .chip.d5::before { background: var(--d5); }
+.chip.d6 { background: var(--d6-tint); color: var(--d6-ink); } .chip.d6::before { background: var(--d6); }
+.chip.plain::before { display: none; }
+.chip.multi { background: var(--sheet); box-shadow: inset 0 0 0 1px var(--ink-2); }
+.tag { font-size: 11.5px; font-weight: 700; padding: 0 8px; border-radius: 4px; white-space: nowrap; line-height: 1.8; }
+.tag.same { background: var(--bad); color: #fff; }
+.tag.diff { background: var(--bad-tint); color: var(--bad); box-shadow: inset 0 0 0 1px var(--bad); }
+.tag.lost { background: var(--warn-tint); color: var(--warn); }
+.tag.wrong { background: var(--bad-tint); color: var(--bad); }
+.tag.fixed { background: var(--paper-2); color: var(--ink-2); }
+.tag.marked { background: var(--sheet); color: var(--ink-2); box-shadow: inset 0 0 0 1px var(--line-strong); }
+
+/* question */
+.qcard { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); padding: 18px 18px 16px; display: grid; gap: 14px; }
+.qmeta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+.qsrc { font-family: var(--f-mono); font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.qtext { margin: 0; white-space: pre-line; font-size: 15.5px; }
+.qhint { margin: 0; font-size: 13px; font-weight: 700; color: var(--ink-2); }
+.opts { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.opt { width: 100%; box-sizing: border-box; text-align: left; cursor: pointer; display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 4px 10px; align-items: start; padding: 11px 14px; border: 1.5px solid var(--rule); border-radius: 8px; background: var(--sheet); line-height: 1.7; font-size: 15px; }
+.opt:hover:not(:disabled) { border-color: var(--line-strong); background: var(--paper); }
+.opt .k { width: 24px; height: 24px; box-sizing: border-box; border-radius: 50%; border: 1.5px solid var(--line-strong); display: grid; place-items: center; font-family: var(--f-mono); font-weight: 600; font-size: 12.5px; line-height: 1; margin-top: 2px; background: var(--sheet); }
+.opts.multi .opt .k { border-radius: 5px; }
+.opt .mark { grid-column: 2; font-size: 12px; font-weight: 700; }
+.opt .mark:empty { display: none; }
+.opt[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-tint); }
+.opt[aria-pressed="true"] .k { background: var(--accent); border-color: var(--accent); color: #fff; }
+.opt:disabled { cursor: default; color: var(--ink); }
+.opt.is-ok { border-color: var(--good); background: var(--good-tint); }
+.opt.is-ok .k { background: var(--good); border-color: var(--good); color: #fff; }
+.opt.is-ok .mark { color: var(--good); }
+.opt.is-ng { border-color: var(--bad); background: var(--bad-tint); }
+.opt.is-ng .k { background: var(--bad); border-color: var(--bad); color: #fff; }
+.opt.is-ng .mark { color: var(--bad); }
+.opt.is-off { color: var(--ink-2); }
+.po { margin: 6px 0 0 50px; font-size: 13.5px; color: var(--ink-2); line-height: 1.7; }
+.exp { display: grid; gap: 12px; border-top: 1px dashed var(--rule); padding-top: 14px; }
+.exp p { margin: 0; }
+.exp .row { display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 10px; }
+.exp .lab { font-family: var(--f-display); font-weight: 700; font-size: 13px; color: var(--ink-2); padding-top: 2px; }
+.exp .row.key > span:last-child { font-weight: 700; }
+.exp .row.trap .lab { color: var(--bad); }
+.exp .extra { font-size: 14px; color: var(--ink-2); }
+.exp .note { font-size: 13px; color: var(--ink-2); background: var(--paper); border-radius: 4px; padding: 8px 10px; }
+.exp .note b { color: var(--ink); }
+.exp .past { font-size: 13px; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.exp .past b { color: var(--ink); font-family: var(--f-mono); }
+.exp .past .x { color: var(--bad); font-weight: 700; }
+.exp .past .o { color: var(--good); font-weight: 700; }
+details.orig { background: var(--paper); border-radius: 6px; padding: 8px 12px; }
+details.orig summary { cursor: pointer; font-weight: 700; font-size: 13.5px; }
+.md { font-size: 14px; color: var(--ink-2); display: grid; gap: 8px; padding-top: 8px; }
+.md p { margin: 0; }
+.md b { color: var(--ink); }
+.qnav { display: flex; justify-content: space-between; gap: 10px; }
+@media (max-width: 560px) {
+  .qcard { padding: 14px 14px 12px; }
+  .exp .row { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .po { margin-left: 4px; }
+}
+
+/* bottom action bar */
+.act { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; background: var(--sheet); border-top: 1px solid var(--rule); box-shadow: 0 -2px 10px rgba(22, 32, 58, .06); }
+.act-in { max-width: 760px; margin: 0 auto; box-sizing: border-box; padding: 10px var(--gutter-r) calc(10px + env(safe-area-inset-bottom, 0px)) var(--gutter-l); display: flex; align-items: center; gap: 12px; }
+.act-msg { flex: 1 1 auto; min-width: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.4; }
+.act-msg .res { display: inline-flex; align-items: center; gap: 6px; font-family: var(--f-display); font-weight: 900; font-size: 18px; }
+.act-msg .res.ok { color: var(--good); }
+.act-msg .res.ng { color: var(--bad); }
+.act-msg small { display: block; font-size: 12.5px; color: var(--ink-2); }
+.act .btn { flex: none; min-width: 8.5em; }
+
+/* done */
+.done { display: grid; gap: 18px; }
+.done h2 { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: 26px; }
+.score-big { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: 40px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.score-big small { font-size: 16px; font-weight: 700; color: var(--ink-2); margin-left: 8px; }
+.rlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rlist button { width: 100%; box-sizing: border-box; text-align: left; cursor: pointer; display: grid; grid-template-columns: 2em minmax(0, 1fr); gap: 2px 10px; align-items: start; padding: 9px 12px; border: 1px solid var(--rule); border-radius: 6px; background: var(--sheet); }
+.rlist button:hover { border-color: var(--line-strong); }
+.rlist .rm { font-family: var(--f-display); font-weight: 900; font-size: 17px; line-height: 1.5; }
+.rlist .rm.o { color: var(--good); } .rlist .rm.x { color: var(--bad); } .rlist .rm.n { color: var(--ink-3); }
+.rlist .rt { font-size: 13.5px; line-height: 1.6; display: grid; gap: 2px; min-width: 0; }
+.rlist .rt span:last-child { color: var(--ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+</style>
+
+<header class="bar">
+  <div class="bar-in">
+    <button class="ghost" id="homeBtn" type="button" hidden>セット選択</button>
+    <div class="bar-title"><b id="barTitle">{{QUIZ_TITLE}}</b><span id="barSub">{{MOCK_RANGE}} で落とした問題を原文で解き直す</span></div>
+    <div class="bar-score" id="barScore"></div>
+  </div>
+  <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+</header>
+
+<main>
+  <section class="home" id="home" aria-labelledby="homeTitle">
+    <h1 id="homeTitle">{{QUIZ_TITLE}}</h1>
+    <p class="lead" id="homeLead">{{MOCK_RANGE}} で間違えた問題と、見直しマークを付けた問題を、模試の原文のまま解き直す。選択肢を選んで「回答する」を押すと、その場で正誤と解説が出る。</p>
+    <dl class="record" id="record"></dl>
+    <p class="store-note" id="storeNote">記録はこのブラウザに保存しています。</p>
+    <div class="resume" id="resume" hidden>
+      <p id="resumeText"></p>
+      <div class="btn-row"><button class="btn" id="resumeBtn" type="button">続きから解く</button></div>
+    </div>
+    <fieldset class="sets" id="sets">
+      <legend>解くセットを選ぶ</legend>
+    </fieldset>
+    <div class="toggles">
+      <label><input type="checkbox" id="optUnsolved">この問題集でまだ正解していない問題だけ</label>
+      <label><input type="checkbox" id="optShuffle">順番をシャッフルする</label>
+    </div>
+    <div class="start-row">
+      <button class="btn" id="startBtn" type="button">始める</button>
+      <p id="startNote"></p>
+    </div>
+    <p class="foot">問題文・選択肢・選択肢ごとの解説・模試の解説は、{{MOCK_RANGE}} の書き出しの原文。決め手・引っかかり・補足・採点キー注は {{SHEET_TITLE}} から。キーボードでは A〜E（1〜5）で選び、Enter で回答と次へ。</p>
+  </section>
+
+  <section id="quiz" hidden aria-label="問題">
+    <article class="qcard">
+      <div class="qmeta" id="qMeta"></div>
+      <p class="qtext" id="qText"></p>
+      <p class="qhint" id="qHint"></p>
+      <ol class="opts" id="qOpts"></ol>
+      <div class="exp" id="qExp" hidden></div>
+      <div class="qnav">
+        <button class="ghost" id="prevBtn" type="button">← 前の問題</button>
+        <button class="ghost" id="skipBtn" type="button">とばす →</button>
+      </div>
+    </article>
+  </section>
+
+  <section class="done" id="done" hidden aria-labelledby="doneTitle">
+    <h2 id="doneTitle">この回の結果</h2>
+    <p class="score-big" id="doneScore"></p>
+    <div class="btn-row" id="doneBtns"></div>
+    <ol class="rlist" id="doneList"></ol>
+  </section>
+</main>
+
+<div class="act" id="act" hidden>
+  <div class="act-in">
+    <div class="act-msg" id="actMsg" aria-live="polite"></div>
+    <button class="btn" id="actBtn" type="button" disabled>回答する</button>
+  </div>
+</div>
+
+<script type="application/json" id="quiz-data">/*__DATA__*/</script>
+<script>
+(function () {
+  'use strict';
+  var DATA = JSON.parse(document.getElementById('quiz-data').textContent);
+  var ITEMS = DATA.items;
+  var BY_ID = {};
+  ITEMS.forEach(function (it) { BY_ID[it.id] = it; });
+  var CAT = { same: '2回とも同じ答え', diff: '2回とも誤り', lost: '2回目で誤り', wrong: '間違えた問題', fixed: '2回目で正解', marked: '見直しで正解' };
+  var RANK = { same: 0, diff: 1, lost: 2, wrong: 3, fixed: 4, marked: 5 };
+  var DOM = DATA.domains || {};
+  var SETS = [
+    { key: 'same', group: '優先して解く', title: '2回とも同じ答えで間違えた', desc: '1回目と同じ選択肢を2回目も選んだ問題。思い込みが残っている', f: function (it) { return it.cat === 'same'; } },
+    { key: 'again', group: '優先して解く', title: '2回目も間違えた', desc: '2回目に間違えた問題すべて（同じ答え・違う答え・2回目で初めて）', f: function (it) { return it.cat === 'same' || it.cat === 'diff' || it.cat === 'lost'; } },
+    { key: 'all', group: '優先して解く', title: '苦手問題すべて', desc: '間違えた問題と見直しマークの問題。上のセットの問題から順に出る', f: function () { return true; } }
+  ];
+  Object.keys(DOM).map(Number).sort(function (a, b) { return a - b; }).forEach(function (d) {
+    SETS.push({ key: 'd' + d, dom: d, group: '分野ごとに解く', title: '分野' + d + ' ' + DOM[d], desc: '', f: function (it) { return it.dom === d; } });
+  });
+  SETS = SETS.filter(function (s) { return ITEMS.some(s.f); });
+  var SET_BY = {};
+  SETS.forEach(function (s) { SET_BY[s.key] = s; });
+
+  var LS_H = '{{SLUG}}-quiz-hist-v1', LS_S = '{{SLUG}}-quiz-session-v1', LS_O = '{{SLUG}}-quiz-opts-v1';
+  function lsGet(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function md(s) {
+    return String(s || '').trim().split(/\n{2,}/).map(function (p) {
+      return '<p>' + esc(p).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+  }
+  function letters(a) { return a && a.length ? a.join('・') : '—'; }
+  function sameSet(a, b) { return a.length === b.length && a.slice().sort().join() === b.slice().sort().join(); }
+  function jumpTop() {
+    var r = document.documentElement, prev = r.style.scrollBehavior;
+    r.style.scrollBehavior = 'auto';
+    window.scrollTo(0, 0);
+    r.style.scrollBehavior = prev;
+  }
+
+  var hist = lsGet(LS_H, {}) || {};
+  Object.keys(hist).forEach(function (k) { if (!BY_ID[k] || !validEntry(hist[k])) delete hist[k]; });
+  var opts = lsGet(LS_O, null) || { set: SETS[0].key, unsolved: false, shuffle: false };
+  if (!SET_BY[opts.set]) opts.set = SETS[0].key;
+  var session = lsGet(LS_S, null);
+  if (session && (!Array.isArray(session.ids) || typeof session.idx !== 'number')) session = null;
+  if (session) {
+    session.ids = session.ids.filter(function (id) { return BY_ID[id]; });
+    session.res = session.res || {};
+    if (!session.ids.length) session = null;
+  }
+  var sel = [];
+  var view = 'home';
+
+  function validEntry(e) { return e && typeof e === 'object' && typeof e.ok === 'boolean' && typeof e.t === 'number'; }
+  function solved(id) { return !!(hist[id] && hist[id].ok); }
+
+  /* ---------- storage: this browser, plus the viewer's own account record when available ---------- */
+  var remote = null, writing = false, dirty = false;
+  function setStoreNote(kind) {
+    $('storeNote').textContent = kind === 'account'
+      ? '記録はアカウントにも保存しています。PC とスマホで同じ記録を使えます。'
+      : '記録はこのブラウザに保存しています。';
+  }
+  function pushRemote() {
+    if (!remote) return;
+    if (writing) { dirty = true; return; }
+    writing = true;
+    remote.set({ v: 1, h: hist }).catch(function (err) {
+      if (err && (err.code === 'invalid_argument' || err.code === 'revoked' || err.code === 'not_granted')) { remote = null; setStoreNote('local'); }
+    }).then(function () {
+      writing = false;
+      if (dirty) { dirty = false; pushRemote(); }
+    });
+  }
+  function mergeRemote(h) {
+    var changed = false, push = false;
+    if (h && typeof h === 'object') {
+      Object.keys(h).forEach(function (k) {
+        var r = h[k];
+        if (!BY_ID[k] || !validEntry(r)) return;
+        if (!hist[k] || r.t > hist[k].t) { hist[k] = r; changed = true; }
+      });
+    }
+    Object.keys(hist).forEach(function (k) { if (!h || !validEntry(h[k]) || hist[k].t > h[k].t) push = true; });
+    if (changed) { lsSet(LS_H, hist); if (view === 'home') renderHome(); if (view === 'done') renderDone(); }
+    if (push) pushRemote();
+  }
+  function initRemote() {
+    if (!window.claude || typeof window.claude.use !== 'function') return;
+    Promise.all([window.claude.use('db'), window.claude.use('user')]).then(function (r) {
+      var db = r[0], user = r[1];
+      if (!db || !user) return null;
+      return user.id().then(function (uid) {
+        if (!uid) return null;
+        var ref = db.doc('data/users/' + uid + '/quiz');
+        var timer;
+        var timeout = new Promise(function (res) { timer = setTimeout(function () { res('timeout'); }, 10000); });
+        return Promise.race([ref.get(), timeout]).then(function (snap) {
+          clearTimeout(timer);
+          if (snap === 'timeout') return null;
+          remote = ref;
+          setStoreNote('account');
+          var d = snap.exists ? snap.data() : null;
+          mergeRemote(d && d.h);
+          return null;
+        });
+      });
+    }).catch(function () { remote = null; });
+  }
+
+  /* ---------- top bar ---------- */
+  function renderBar() {
+    var home = view === 'home';
+    $('homeBtn').hidden = home;
+    if (home || !session) {
+      $('barTitle').textContent = '{{QUIZ_TITLE}}';
+      $('barSub').textContent = '{{MOCK_RANGE}} で落とした問題を原文で解き直す';
+      $('barScore').textContent = '';
+      $('meter').style.width = '0';
+      return;
+    }
+    var n = session.ids.length, answered = 0, ok = 0;
+    session.ids.forEach(function (id) { var r = session.res[id]; if (r) { answered++; if (r.ok) ok++; } });
+    $('barTitle').textContent = session.title;
+    $('barSub').textContent = view === 'done' ? '結果' : '問題 ' + (session.idx + 1) + ' / ' + n;
+    $('barScore').innerHTML = '正解 <b>' + ok + '</b> / ' + answered;
+    $('meter').style.width = (n ? answered / n * 100 : 0) + '%';
+  }
+
+  /* ---------- home ---------- */
+  function setItems(s) { return ITEMS.filter(s.f); }
+  function renderHome() {
+    view = 'home';
+    $('home').hidden = false; $('quiz').hidden = true; $('done').hidden = true; $('act').hidden = true;
+    var tried = 0, okNow = 0, tries = 0;
+    ITEMS.forEach(function (it) { var h = hist[it.id]; if (h) { tried++; tries += h.n || 1; if (h.ok) okNow++; } });
+    $('record').innerHTML =
+      '<div><dt>問題</dt><dd>' + ITEMS.length + ' <small>問</small></dd></div>' +
+      '<div><dt>この問題集で解いた</dt><dd>' + tried + ' <small>問</small></dd></div>' +
+      '<div><dt>直近の答えが正解</dt><dd>' + okNow + ' <small>問</small></dd></div>' +
+      (SET_BY.same ? '<div><dt>2回とも同じ答え</dt><dd>' + setItems(SET_BY.same).length + ' <small>問</small></dd></div>' : '');
+    var html = '<legend>解くセットを選ぶ</legend>', group = '';
+    SETS.forEach(function (s) {
+      var list = setItems(s), done = list.filter(function (it) { return solved(it.id); }).length;
+      if (s.group !== group) { group = s.group; html += '<p class="group-label">' + esc(group) + '</p>'; }
+      html += '<label class="set" for="set-' + s.key + '"><input type="radio" name="set" id="set-' + s.key + '" value="' + s.key + '"' + (opts.set === s.key ? ' checked' : '') + '>' +
+        '<span class="set-name">' + (s.dom ? '<span class="dot d' + s.dom + '"></span>' : '') + esc(s.title) + '</span>' +
+        '<span class="set-count"><b>' + list.length + '</b> 問 · 正解済み ' + done + '</span>' +
+        (s.desc ? '<span class="set-desc">' + esc(s.desc) + '</span>' : '') + '</label>';
+    });
+    $('sets').innerHTML = html;
+    $('optUnsolved').checked = !!opts.unsolved;
+    $('optShuffle').checked = !!opts.shuffle;
+    if (session && Object.keys(session.res).length < session.ids.length) {
+      var answered = Object.keys(session.res).length;
+      $('resume').hidden = false;
+      $('resumeText').textContent = '途中のセット：' + session.title + '（' + session.ids.length + ' 問中 ' + answered + ' 問 回答済み）';
+    } else {
+      $('resume').hidden = true;
+    }
+    updateStart();
+    renderBar();
+  }
+  function buildIds() {
+    var s = SET_BY[opts.set];
+    var list = setItems(s);
+    if (opts.unsolved) list = list.filter(function (it) { return !solved(it.id); });
+    list = list.slice().sort(function (a, b) { return RANK[a.cat] - RANK[b.cat] || a.m - b.m || a.n - b.n; });
+    if (opts.shuffle) {
+      for (var i = list.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = list[i]; list[i] = list[j]; list[j] = t; }
+    }
+    return list.map(function (it) { return it.id; });
+  }
+  function updateStart() {
+    var n = buildIds().length;
+    $('startBtn').disabled = n === 0;
+    $('startBtn').textContent = n ? 'この ' + n + ' 問を始める' : '始める';
+    $('startNote').textContent = n ? '' : 'このセットは、この問題集で全問に正解済み。「まだ正解していない問題だけ」を外すと、もう一度解ける。';
+  }
+  $('sets').addEventListener('change', function (e) {
+    if (e.target && e.target.name === 'set') { opts.set = e.target.value; lsSet(LS_O, opts); updateStart(); }
+  });
+  $('optUnsolved').addEventListener('change', function () { opts.unsolved = this.checked; lsSet(LS_O, opts); updateStart(); });
+  $('optShuffle').addEventListener('change', function () { opts.shuffle = this.checked; lsSet(LS_O, opts); updateStart(); });
+  $('startBtn').addEventListener('click', function () {
+    var ids = buildIds();
+    if (!ids.length) return;
+    var s = SET_BY[opts.set];
+    startSession(s.title + (opts.unsolved ? '（未正解）' : ''), ids);
+  });
+  $('resumeBtn').addEventListener('click', function () {
+    var i = session.ids.findIndex(function (id) { return !session.res[id]; });
+    session.idx = i < 0 ? 0 : i;
+    showQuestion();
+  });
+  function startSession(title, ids) {
+    session = { title: title, ids: ids, idx: 0, res: {} };
+    lsSet(LS_S, session);
+    showQuestion();
+  }
+
+  /* ---------- question ---------- */
+  function cur() { return BY_ID[session.ids[session.idx]]; }
+  function showQuestion() {
+    view = 'quiz';
+    $('home').hidden = true; $('done').hidden = true; $('quiz').hidden = false; $('act').hidden = false;
+    var it = cur(), done = session.res[it.id];
+    sel = done ? done.sel.slice() : [];
+    var need = it.c.length;
+    $('qMeta').innerHTML =
+      '<span class="chip d' + it.dom + '">' + esc(it.sub) + '</span>' +
+      '<span class="tag ' + it.cat + '">' + CAT[it.cat] + '</span>' +
+      (need > 1 ? '<span class="chip plain multi">' + need + 'つ選択</span>' : '') +
+      '<span class="qsrc">' + esc(it.src) + '</span>';
+    $('qText').textContent = it.q;
+    $('qHint').textContent = need > 1 ? '正しいものを ' + need + ' つ選ぶ' : '正しいものを 1 つ選ぶ';
+    var ol = $('qOpts');
+    ol.className = 'opts' + (need > 1 ? ' multi' : '');
+    ol.innerHTML = Object.keys(it.o).sort().map(function (k) {
+      return '<li><button class="opt" type="button" data-k="' + k + '" aria-pressed="false"><span class="k">' + k + '</span><span class="t">' + esc(it.o[k]) + '</span><span class="mark"></span></button>' +
+        '<p class="po" hidden>' + esc(it.po[k] || '') + '</p></li>';
+    }).join('');
+    $('qExp').hidden = true;
+    $('qExp').innerHTML = '';
+    $('prevBtn').disabled = session.idx === 0;
+    $('prevBtn').style.visibility = session.idx === 0 ? 'hidden' : 'visible';
+    $('skipBtn').hidden = !!done;
+    if (done) applyAnswered(it, done); else syncSelection(it);
+    session.idx = session.ids.indexOf(it.id);
+    lsSet(LS_S, session);
+    renderBar();
+    jumpTop();
+  }
+  function syncSelection(it) {
+    var need = it.c.length;
+    Array.prototype.forEach.call($('qOpts').querySelectorAll('.opt'), function (b) {
+      b.setAttribute('aria-pressed', sel.indexOf(b.dataset.k) >= 0 ? 'true' : 'false');
+    });
+    var left = need - sel.length;
+    $('actMsg').textContent = left > 0 ? (need > 1 ? 'あと ' + left + ' つ選ぶ' : '選択肢を 1 つ選ぶ') : '「回答する」で答えを確定する';
+    $('actBtn').textContent = '回答する';
+    $('actBtn').disabled = left !== 0;
+    $('actBtn').dataset.mode = 'answer';
+  }
+  $('qOpts').addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('.opt');
+    if (!b || b.disabled) return;
+    var it = cur();
+    if (session.res[it.id]) return;
+    toggle(it, b.dataset.k);
+  });
+  function toggle(it, k) {
+    if (!it.o[k]) return;
+    var need = it.c.length, i = sel.indexOf(k);
+    if (i >= 0) sel.splice(i, 1);
+    else if (need === 1) sel = [k];
+    else if (sel.length < need) sel.push(k);
+    else { $('actMsg').textContent = '選べるのは ' + need + ' つまで。外してから選び直す'; return; }
+    syncSelection(it);
+  }
+  function answer() {
+    var it = cur();
+    if (session.res[it.id] || sel.length !== it.c.length) return;
+    var ok = sameSet(sel, it.c);
+    var r = { sel: sel.slice().sort(), ok: ok };
+    session.res[it.id] = r;
+    lsSet(LS_S, session);
+    var prev = hist[it.id] || { n: 0, c: 0 };
+    hist[it.id] = { ok: ok, t: Date.now(), n: (prev.n || 0) + 1, c: (prev.c || 0) + (ok ? 1 : 0), s: r.sel.join('') };
+    lsSet(LS_H, hist);
+    pushRemote();
+    applyAnswered(it, r);
+    $('skipBtn').hidden = true;
+    renderBar();
+  }
+  function applyAnswered(it, r) {
+    Array.prototype.forEach.call($('qOpts').querySelectorAll('li'), function (li) {
+      var b = li.querySelector('.opt'), k = b.dataset.k, isC = it.c.indexOf(k) >= 0, isS = r.sel.indexOf(k) >= 0;
+      b.disabled = true;
+      b.setAttribute('aria-pressed', isS ? 'true' : 'false');
+      b.classList.toggle('is-ok', isC);
+      b.classList.toggle('is-ng', isS && !isC);
+      b.classList.toggle('is-off', !isC && !isS);
+      b.querySelector('.mark').textContent = isC && isS ? '正解 · あなたの答え' : isC ? '正解' : isS ? 'あなたの答え' : '';
+      var po = li.querySelector('.po');
+      po.hidden = !po.textContent;
+    });
+    var h = hist[it.id];
+    var parts = [];
+    if (it.key) parts.push('<p class="row key"><span class="lab">決め手</span><span>' + it.key + '</span></p>');
+    if (it.trap) parts.push('<p class="row trap"><span class="lab">引っかかり</span><span>' + it.trap + '</span></p>');
+    it.extra.forEach(function (x) { parts.push('<p class="extra">' + x + '</p>'); });
+    if (it.note) parts.push('<p class="note">' + it.note + '</p>');
+    parts.push('<p class="past">' + it.att.map(function (a, i) {
+      var ok = sameSet(a, it.c);
+      return '<span>' + (i ? (i + 1) + '回目' : '模試の1回目') + ' <b>' + letters(a) + '</b> <span class="' + (ok ? 'o' : 'x') + '">' + (ok ? '○' : '×') + '</span></span>';
+    }).join('') + (h ? '<span>この問題集 ' + h.n + ' 回中 ' + h.c + ' 回正解</span>' : '') + '</p>');
+    parts.push('<details class="orig"><summary>模試の解説（原文）</summary><div class="md">' + md(it.ex) + '</div></details>');
+    $('qExp').innerHTML = parts.join('');
+    $('qExp').hidden = false;
+    $('actMsg').innerHTML = r.ok
+      ? '<span class="res ok">○ 正解</span>'
+      : '<span class="res ng">× 不正解</span><small>正解は ' + letters(it.c) + '</small>';
+    var last = session.idx >= session.ids.length - 1;
+    $('actBtn').textContent = last ? '結果を見る' : '次の問題 →';
+    $('actBtn').disabled = false;
+    $('actBtn').dataset.mode = 'next';
+  }
+  function next() {
+    if (session.idx >= session.ids.length - 1) { renderDone(); return; }
+    session.idx++;
+    showQuestion();
+  }
+  $('actBtn').addEventListener('click', function () {
+    if (this.dataset.mode === 'answer') answer(); else next();
+  });
+  $('prevBtn').addEventListener('click', function () {
+    if (session.idx > 0) { session.idx--; showQuestion(); }
+  });
+  $('skipBtn').addEventListener('click', next);
+  $('homeBtn').addEventListener('click', function () { renderHome(); jumpTop(); });
+
+  /* ---------- done ---------- */
+  function renderDone() {
+    view = 'done';
+    $('home').hidden = true; $('quiz').hidden = true; $('done').hidden = false; $('act').hidden = true;
+    var n = session.ids.length, answered = 0, ok = 0, ng = [];
+    session.ids.forEach(function (id) { var r = session.res[id]; if (r) { answered++; if (r.ok) ok++; else ng.push(id); } });
+    $('doneScore').innerHTML = ok + ' / ' + n + '<small>正解（回答 ' + answered + ' 問）</small>';
+    var btns = '';
+    if (ng.length) btns += '<button class="btn" type="button" id="retryNg">間違えた ' + ng.length + ' 問をもう一度</button>';
+    btns += '<button class="btn sub" type="button" id="backHome">セットを選び直す</button>';
+    $('doneBtns').innerHTML = btns;
+    if (ng.length) $('retryNg').addEventListener('click', function () { startSession(session.title.replace(/（間違えた問題）$/, '') + '（間違えた問題）', ng.slice()); });
+    $('backHome').addEventListener('click', function () { renderHome(); jumpTop(); });
+    $('doneList').innerHTML = session.ids.map(function (id, i) {
+      var it = BY_ID[id], r = session.res[id];
+      var m = !r ? '<span class="rm n">—</span>' : r.ok ? '<span class="rm o">○</span>' : '<span class="rm x">×</span>';
+      return '<li><button type="button" data-i="' + i + '">' + m + '<span class="rt"><span><span class="chip d' + it.dom + '">' + esc(it.sub) + '</span> ' + esc(it.src) + '</span><span>' + esc(it.q) + '</span></span></button></li>';
+    }).join('');
+    renderBar();
+    jumpTop();
+  }
+  $('doneList').addEventListener('click', function (e) {
+    var b = e.target.closest && e.target.closest('button[data-i]');
+    if (!b) return;
+    session.idx = +b.dataset.i;
+    showQuestion();
+  });
+
+  /* ---------- keyboard ---------- */
+  document.addEventListener('keydown', function (e) {
+    if (view !== 'quiz' || e.metaKey || e.ctrlKey || e.altKey) return;
+    var tag = (e.target && e.target.tagName) || '';
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    var it = cur(), key = e.key;
+    if (key === 'Enter') {
+      var onOpt = e.target.closest && e.target.closest('.opt');
+      if (!onOpt && (tag === 'BUTTON' || tag === 'SUMMARY')) return;
+      if (!$('actBtn').disabled) { e.preventDefault(); $('actBtn').click(); }
+      return;
+    }
+    if (key === 'ArrowLeft') { $('prevBtn').click(); return; }
+    if (session.res[it.id]) return;
+    var k = /^[1-5]$/.test(key) ? 'ABCDE'.charAt(+key - 1) : /^[a-eA-E]$/.test(key) ? key.toUpperCase() : '';
+    if (k) { e.preventDefault(); toggle(it, k); }
+  });
+
+  renderHome();
+  initRemote();
+})();
+</script>

@@ -1,13 +1,13 @@
 ---
 name: reviewing-mock-exams
-description: Use when the user shares exported mock or practice exam results for a certification exam (Markdown such as Udemy 演習N.md with 正解 / 自分の回答 per question) and wants the wrong answers organized by exam domain into a study page, or has retaken a mock / taken another one and wants an existing review sheet updated. Triggers include "模試", "演習", "間違えた問題を分野ごとに", "復習 HTML", "解き直した", "practice exam review".
+description: Use when the user shares exported mock or practice exam results for a certification exam (Markdown such as Udemy 演習N.md with 正解 / 自分の回答 per question) and wants the wrong answers organized by exam domain into a study page, or has retaken a mock / taken another one and wants an existing review sheet updated, or wants a tap-to-answer quiz of the missed questions. Triggers include "模試", "演習", "間違えた問題を分野ごとに", "復習 HTML", "解き直した", "問題集", "クイズ", "practice exam review".
 ---
 
 # 模試の復習帳を作る
 
 ## 概要
 
-模試の誤答を、公式試験ガイドの分野ごとに「原理 → 覚える表 → 問題カード」の順で並べた HTML 1 ファイルにする。見た目と部品は `template.html` で固定し、集計は `parse_mock.py`、検査は `check_sheet.py` と `render_figs.py` で機械的に行う。以下 `<skill>` はこのスキルのディレクトリ。
+模試の誤答を、公式試験ガイドの分野ごとに「原理 → 覚える表 → 問題カード」の順で並べた HTML 1 ファイルにする。見た目と部品は `template.html` で固定し、集計は `parse_mock.py`、検査は `check_sheet.py` と `render_figs.py` で機械的に行う。カードの問題を原文のまま1問ずつ解き直す問題集も、`build_quiz.py` で同じ材料から作れる。以下 `<skill>` はこのスキルのディレクトリ。
 
 ## 新しく作るとき
 
@@ -48,6 +48,15 @@ description: Use when the user shares exported mock or practice exam results for
    - localStorage のキーは変えない（チェックが消える）。
 6. **検査する。** `check_sheet.py` を OK にし、`render_figs.py <sheet.html> <作業>/shots --ids <変えたカードや章の id>` で変えた所を見る。`NOTE no chapter tabs` が出たら、タブを足す前の古い復習帳なので、`template.html` から `/* chapter tabs` の CSS、`nav.tabs`、末尾の `#backBtn` と script を移す。
 7. **渡して記録する。** Desktop のファイルと Artifact の両方を更新する。Artifact は既存の URL を `read` してから同じ URL に publish する。メモリの `<略称>-exam-prep` に回の結果を足す。
+
+## 問題集を作るとき
+
+復習帳のカードにある問題を、模試の原文のまま1問ずつ解くページにする。選択肢を選んで「回答する」を押すと、その場で正誤、選択肢ごとの解説、カードの決め手が出る。問題文と選択肢は自分で書かない。
+
+1. **材料をそろえる。** 復習帳（`mock-mN` の script があるもの）と、模試ごとの `parse_mock.py <模試.md> --out <作業>/mN.json` の JSON。どの回の書き出しでもよいので、最新のものを使う。
+2. **組み立てる。** `python3 -I <skill>/scripts/build_quiz.py <sheet.html> <作業>/quiz.html m1=<m1.json> m2=<m2.json> …`。出力の問題数と分類の内訳を確かめる。分類は最後の2回の答えで決まる（2回とも同じ答え・2回とも誤り・2回目で誤り・2回目で正解・見直しで正解。1回だけなら間違えた問題・見直しで正解）。`PROBLEM` が出たら、足りない JSON を渡す。
+3. **渡す。** `~/Desktop/<略称>-quiz.html` に置き、Artifact で `capabilities: {db: {}, user: {}}` を付けて private 公開する。答えの記録を、ブラウザとアカウント（`data/users/<id>/quiz`）の両方に残し、PC とスマホで共有するため。公開後に `read_db`（`data/users/me` の `quiz`）を1回読んで、保存先に届くことを確かめる。
+4. **作り直す。** 復習帳を更新したら同じコマンドで作り直し、同じファイルパスで publish する。`--slug` は変えない（ブラウザの記録のキーになる）。
 
 ## 章立て
 
@@ -122,3 +131,4 @@ description: Use when the user shares exported mock or practice exam results for
 | 前回の md が消えていて比べられない | HTML 内の `mock-mN` を `--prev` に渡す |
 | Desktop か Artifact の片方だけ更新する | 両方を更新する |
 | 章を足したのにタブを足さず、その章が開けない | `check_sheet.py` の `chapter without a tab` を直す |
+| 問題集の問題文や選択肢を、カードの要約や自作の文で作る | `build_quiz.py` に `parse_mock.py` の JSON を渡し、原文をそのまま使う |
