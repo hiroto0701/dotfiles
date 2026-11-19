@@ -28,8 +28,9 @@
   --f-body: "BIZ UDPGothic", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
   --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --r: 6px;
+  --bar-h: 49px;
 }
-html { scroll-behavior: smooth; scroll-padding-top: 16px; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 8px); }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 body {
   margin: 0;
@@ -315,6 +316,56 @@ table.tbl { border-collapse: collapse; width: 100%; font-size: 13.5px; line-heig
 
 footer.foot { font-size: 12.5px; color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 16px; display: grid; gap: 4px; }
 footer.foot p { margin: 0; }
+
+/* chapter tabs: 1章ずつ表示し、章をまたぐリンクはタブを切り替えてから飛ぶ */
+[hidden]:not([hidden="until-found"]) { display: none !important; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--sheet); }
+.tabs { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--sheet); border-bottom: 1px solid var(--rule); box-shadow: 0 1px 0 var(--rule); }
+.tabs-in {
+  position: relative; max-width: 1180px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; align-items: center; gap: 2px;
+  overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.tabs-in::-webkit-scrollbar { display: none; }
+.tab { flex: none; display: inline-flex; align-items: center; gap: 7px; height: 48px; padding: 3px 12px 0; box-sizing: border-box; border-bottom: 3px solid transparent; font-size: 13.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; white-space: nowrap; }
+.tab:hover { color: var(--ink); background: var(--paper); }
+.tab:focus-visible { outline-offset: -3px; }
+.tab[aria-current="page"] { color: var(--ink); border-bottom-color: var(--ink); }
+.tab.d1[aria-current="page"] { border-bottom-color: var(--d1); }
+.tab.d2[aria-current="page"] { border-bottom-color: var(--d2); }
+.tab.d3[aria-current="page"] { border-bottom-color: var(--d3); }
+.tab.d4[aria-current="page"] { border-bottom-color: var(--d4); }
+.tab.d5[aria-current="page"] { border-bottom-color: var(--d5); }
+.tab.d6[aria-current="page"] { border-bottom-color: var(--d6); }
+.tab .lb { line-height: 1.2; }
+.tab .n { font-family: var(--f-mono); font-size: 11.5px; font-weight: 500; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.tab-sep { flex: none; width: 1px; height: 20px; background: var(--rule); margin: 0 6px; }
+aside.toc { top: calc(env(safe-area-inset-top, 0px) + var(--bar-h) + 16px); max-height: calc(100vh - var(--bar-h) - 32px); }
+body.tabbed main { gap: 0; }
+body.tabbed main > .foot { margin-top: 56px; }
+.toc-cap { margin: 0 0 6px; font-family: var(--f-display); font-weight: 700; font-size: 12px; letter-spacing: .06em; color: var(--ink-3); }
+nav.toc-nav ol.toc-local { display: grid; gap: 2px; }
+nav.toc-nav ol.toc-local > li > a { display: block; padding: 3px 6px; border-radius: 4px; font-size: 13px; font-weight: 700; line-height: 1.5; color: var(--ink); text-decoration: none; }
+nav.toc-nav ol.toc-local > li > a:hover { background: var(--paper-2); }
+nav.toc-nav ol.toc-local ol { padding-left: 12px; margin: 2px 0 6px; }
+@media (max-width: 980px) { body.tabbed nav.toc-nav { display: none; } }
+.chap-nav { display: flex; flex-wrap: wrap; gap: 12px; padding-top: 18px; border-top: 1px solid var(--rule); }
+.chap-nav a { display: grid; gap: 2px; padding: 10px 16px; background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); color: var(--ink); text-decoration: none; }
+.chap-nav a:hover { border-color: var(--ink-2); }
+.chap-nav a small { font-size: 12px; color: var(--ink-3); }
+.chap-nav a b { font-family: var(--f-display); font-size: 15px; }
+.chap-nav a.next { margin-left: auto; text-align: right; }
+.back {
+  position: fixed; z-index: 6;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer;
+  padding: 9px 16px; border-radius: 99px; border: 1px solid var(--ink);
+  background: var(--ink); color: #fff; box-shadow: 0 2px 10px rgba(22, 32, 58, .2);
+}
+.back:hover { background: var(--accent); border-color: var(--accent); }
 </style>
 
 <header class="hero">
@@ -330,6 +381,20 @@ footer.foot p { margin: 0; }
     </dl>
   </div>
 </header>
+
+<nav class="tabs" aria-label="章の切り替え">
+  <div class="tabs-in">
+    <a class="tab" href="#overview" data-title="試験の全体像"><span class="lb">全体像</span></a>
+    <a class="tab" href="#basics" data-title="{{分野の}}基礎用語"><span class="lb">基礎用語</span></a>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <!-- 分野の章ごとに 1 つ、章と同じ順で。lb は 6 文字ほどの短い名前、data-title は前後の章ボタンに出す正式な名前。.n の枚数は script が数える -->
+    <a class="tab d1" href="#d1" data-title="分野1 {{分野名}}"><span class="dot d1"></span><span class="lb">1 {{短い分野名}}</span><span class="n"></span></a>
+    <span class="tab-sep" aria-hidden="true"></span>
+    <a class="tab" href="#patterns" data-title="間違いのパターン"><span class="lb">パターン</span></a>
+    <a class="tab" href="#errata" data-title="採点キーへの注意"><span class="lb">採点キー</span></a>
+    <a class="tab" href="#index" data-title="全問の一覧"><span class="lb">一覧</span></a>
+  </div>
+</nav>
 
 <div class="wrap">
 <aside class="toc" aria-label="目次と復習ツール">
@@ -575,6 +640,185 @@ footer.foot p { margin: 0; }
     var d = Math.round((new Date(+p[0], +p[1] - 1, +p[2]) - today) / 86400000);
     if (d > 0) { el.textContent = d; }
     else { el.parentNode.textContent = d === 0 ? '今日' : '受験済み'; }
+  }
+})();
+</script>
+<button class="back" id="backBtn" type="button" hidden></button>
+<script>
+(function () {
+  var bar = document.querySelector('.tabs');
+  var strip = bar && bar.querySelector('.tabs-in');
+  var tabs = bar ? Array.prototype.slice.call(bar.querySelectorAll('a.tab')) : [];
+  var chaps = Array.prototype.slice.call(document.querySelectorAll('main > section.chap'));
+  if (!tabs.length || !chaps.length) return;
+  var main = document.querySelector('main');
+  var nav = document.querySelector('nav.toc-nav');
+  var backBtn = document.getElementById('backBtn');
+  var root = document.documentElement;
+  var KEY = 'review-tab-{{exam-slug}}-v1';
+  var HIDE = 'onbeforematch' in document.body ? 'until-found' : '';
+  var pos = {};
+  var current = null;
+  var origin = null;
+
+  function tabOf(id) {
+    for (var i = 0; i < tabs.length; i++) if (tabs[i].getAttribute('href') === '#' + id) return tabs[i];
+    return null;
+  }
+  function syncBar() { root.style.setProperty('--bar-h', bar.offsetHeight + 'px'); }
+  function jump(fn) {
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    fn();
+    root.style.scrollBehavior = prev;
+  }
+  function chapTop() { return main.getBoundingClientRect().top + window.scrollY - bar.offsetHeight - 12; }
+
+  function buildLocal(chap) {
+    if (!nav) return;
+    var ol = document.createElement('ol');
+    ol.className = 'toc-local';
+    var parent = null, sub = null, k = 0;
+    chap.querySelectorAll('h3, .subhead').forEach(function (h) {
+      if (h.closest('.q, figure')) return;
+      if (!h.id) h.id = chap.id + '-h' + (++k);
+      var a = document.createElement('a');
+      a.href = '#' + h.id;
+      a.textContent = h.textContent.trim();
+      var li = document.createElement('li');
+      li.appendChild(a);
+      if (h.tagName === 'H3' || !parent) {
+        ol.appendChild(li);
+        parent = h.tagName === 'H3' ? li : null;
+        sub = null;
+      } else {
+        if (!sub) { sub = document.createElement('ol'); parent.appendChild(sub); }
+        sub.appendChild(li);
+      }
+    });
+    var cap = document.createElement('p');
+    cap.className = 'toc-cap';
+    cap.textContent = 'この章の中';
+    nav.textContent = '';
+    nav.appendChild(cap);
+    nav.appendChild(ol);
+  }
+
+  function show(id) {
+    if (current === id) return;
+    chaps.forEach(function (c) {
+      if (c.id === id) c.removeAttribute('hidden'); else c.setAttribute('hidden', HIDE);
+    });
+    tabs.forEach(function (t) {
+      if (t.getAttribute('href') !== '#' + id) { t.removeAttribute('aria-current'); return; }
+      t.setAttribute('aria-current', 'page');
+      var l = t.offsetLeft, r = l + t.offsetWidth;
+      if (l < strip.scrollLeft + 24) strip.scrollLeft = l - 24;
+      else if (r > strip.scrollLeft + strip.clientWidth - 24) strip.scrollLeft = r - strip.clientWidth + 24;
+    });
+    current = id;
+    buildLocal(document.getElementById(id));
+    try { localStorage.setItem(KEY, id); } catch (e) {}
+  }
+
+  function setBack(from) {
+    origin = from;
+    var t = tabOf(from.chap);
+    backBtn.textContent = '← ' + (t ? t.querySelector('.lb').textContent : '元の場所') + 'に戻る';
+    backBtn.hidden = false;
+  }
+  function clearBack() { origin = null; backBtn.hidden = true; }
+
+  function openTab(id, restore) {
+    if (current && current !== id) pos[current] = window.scrollY;
+    var same = current === id;
+    show(id);
+    var top = chapTop();
+    jump(function () {
+      if (restore && !same && pos[id] != null) window.scrollTo(0, pos[id]);
+      else if (window.scrollY > top || !restore) window.scrollTo(0, top);
+    });
+  }
+
+  function goTo(el, from) {
+    var chap = el.closest('section.chap');
+    if (current) pos[current] = window.scrollY;
+    show(chap.id);
+    jump(function () { el.scrollIntoView({ block: 'start' }); });
+    if (from) setBack(from); else clearBack();
+  }
+
+  tabs.forEach(function (t) {
+    var c = document.getElementById(t.getAttribute('href').slice(1));
+    var n = c ? c.querySelectorAll('article.q').length : 0;
+    var el = t.querySelector('.n');
+    if (el && n) { el.textContent = n; t.title = t.dataset.title + '（カード ' + n + ' 枚）'; }
+    else t.title = t.dataset.title;
+  });
+
+  chaps.forEach(function (c, i) {
+    var nv = document.createElement('nav');
+    nv.className = 'chap-nav';
+    nv.setAttribute('aria-label', '前後の章');
+    [[chaps[i - 1], 'prev', '← 前の章'], [chaps[i + 1], 'next', '次の章 →']].forEach(function (x) {
+      if (!x[0]) return;
+      var t = tabOf(x[0].id);
+      var a = document.createElement('a');
+      a.href = '#' + x[0].id;
+      a.className = x[1];
+      var s = document.createElement('small');
+      s.textContent = x[2];
+      var b = document.createElement('b');
+      b.textContent = t ? t.dataset.title : x[0].id;
+      a.appendChild(s);
+      a.appendChild(b);
+      nv.appendChild(a);
+    });
+    c.appendChild(nv);
+    c.addEventListener('beforematch', function () {
+      if (current) pos[current] = window.scrollY;
+      show(c.id);
+    });
+  });
+
+  document.addEventListener('click', function (e) {
+    if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a) return;
+    var id = decodeURIComponent(a.getAttribute('href').slice(1));
+    var el = id && document.getElementById(id);
+    if (!el || !el.closest('section.chap')) return;
+    e.preventDefault();
+    if (a.classList.contains('tab')) { clearBack(); openTab(el.id, true); return; }
+    if (a.closest('.chap-nav')) { clearBack(); openTab(el.id, false); return; }
+    if (a.closest('nav.toc-nav')) { goTo(el, null); return; }
+    goTo(el, { chap: current, y: window.scrollY });
+  });
+
+  backBtn.addEventListener('click', function () {
+    if (!origin) return;
+    var o = origin;
+    clearBack();
+    if (current) pos[current] = window.scrollY;
+    show(o.chap);
+    jump(function () { window.scrollTo(0, o.y); });
+  });
+
+  function fromHash() {
+    var h = location.hash ? decodeURIComponent(location.hash.slice(1)) : '';
+    var el = h && document.getElementById(h);
+    if (el && el.closest('section.chap')) { goTo(el, null); return true; }
+    return false;
+  }
+  window.addEventListener('hashchange', fromHash);
+  window.addEventListener('resize', syncBar);
+
+  document.body.classList.add('tabbed');
+  syncBar();
+  if (!fromHash()) {
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    show(saved && tabOf(saved) && document.getElementById(saved) ? saved : chaps[0].id);
   }
 })();
 </script>

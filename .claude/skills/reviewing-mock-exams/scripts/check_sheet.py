@@ -4,7 +4,9 @@ usage: python3 -I check_sheet.py <sheet.html>
 
 Fails (exit 1) on: unclosed or stray tags, duplicate ids, links or markers that
 point to a missing id, CSS classes used but not defined, SVG rects without a
-fill, a card without its "next time" checkbox, template placeholders left in.
+fill, a card without its "next time" checkbox, template placeholders left in,
+and (when the sheet has the chapter tabs) a chapter without a tab or a tab that
+points to something other than a chapter.
 """
 import re
 import sys
@@ -70,6 +72,13 @@ def main(path):
     cards = re.findall(r'<article class="q[^"]*" id="([^"]+)"', src)
     boxes = set(re.findall(r'data-q="([^"]+)"', src))
     problems += [f"card without checkbox: {c}" for c in cards if c not in boxes]
+    chaps = re.findall(r'<section class="chap\b[^"]*" id="([^"]+)"', src)
+    tabs = re.findall(r'<a class="tab\b[^"]*" href="#([^"]+)"', src)
+    if tabs:
+        problems += [f"chapter without a tab: #{c}" for c in chaps if c not in tabs]
+        problems += [f"tab that is not a chapter: #{t}" for t in tabs if t not in chaps]
+    elif chaps:
+        print("NOTE no chapter tabs (nav.tabs); every chapter shows at once")
     for ph in sorted(set(re.findall(r"\{\{[^}]*\}\}", src))):
         problems.append(f"template placeholder left in: {ph}")
     print(f"cards: {len(cards)}  figures: {len(re.findall(r'<figure', src))}  svg: {len(re.findall(r'<svg', src))}")

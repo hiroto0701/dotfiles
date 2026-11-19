@@ -46,7 +46,7 @@ description: Use when the user shares exported mock or practice exam results for
    - 別の模試なら、棒は全模試の合計にし、その下に分野・演習ごと・計の表を置く。
    - 全問の一覧に「2回目」の列を足し、解き直していない行は「—」にする。パターンの件数は回ごとに書く。
    - localStorage のキーは変えない（チェックが消える）。
-6. **検査する。** `check_sheet.py` を OK にし、`render_figs.py <sheet.html> <作業>/shots --ids <変えたカードや章の id>` で変えた所を見る。
+6. **検査する。** `check_sheet.py` を OK にし、`render_figs.py <sheet.html> <作業>/shots --ids <変えたカードや章の id>` で変えた所を見る。`NOTE no chapter tabs` が出たら、タブを足す前の古い復習帳なので、`template.html` から `/* chapter tabs` の CSS、`nav.tabs`、末尾の `#backBtn` と script を移す。
 7. **渡して記録する。** Desktop のファイルと Artifact の両方を更新する。Artifact は既存の URL を `read` してから同じ URL に publish する。メモリの `<略称>-exam-prep` に回の結果を足す。
 
 ## 章立て
@@ -60,6 +60,8 @@ description: Use when the user shares exported mock or practice exam results for
 | 間違いのパターン | 最優先のルールを1つ枠で示し、パターンごとに件数・問題リンク・「次から」 |
 | 採点キーへの注意 | `parse_mock` が挙げた誤答のうち、解説が想定解を疑っているもの。本番での読み方を書く |
 | 全問の一覧 | 問題番号順。分野・自分・正解・一行・型 |
+
+章は 1 つずつ表示し、hero の下の `nav.tabs` で切り替える。章を足したら、同じ順で `a.tab` を 1 つ足す。分野の章には `d1`〜 のクラスと 6 文字ほどの短い名前を付ける。章をまたぐリンクと戻るボタンは script が受け持つので、リンクは普段どおり `href="#id"` で書く。
 
 ## カードの部品
 
@@ -119,3 +121,4 @@ description: Use when the user shares exported mock or practice exam results for
 | 解き直しで同じ問題のカードを増やす | 既存カードにチップと「2回目」の行を足す |
 | 前回の md が消えていて比べられない | HTML 内の `mock-mN` を `--prev` に渡す |
 | Desktop か Artifact の片方だけ更新する | 両方を更新する |
+| 章を足したのにタブを足さず、その章が開けない | `check_sheet.py` の `chapter without a tab` を直す |
